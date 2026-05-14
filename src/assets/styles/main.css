@@ -1,0 +1,62 @@
+/* ===== Variables CSS globales ===== */
+:root {
+  --border-radius: 12px;
+  --transition-speed: 0.3s;
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.08);
+  --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.12);
+  --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.16);
+}
+
+/* ===== Reset & Base ===== */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  scroll-behavior: smooth;
+  font-size: 16px;
+}
+
+body {
+  font-family: 'Roboto', sans-serif;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ===== Utilitaires ===== */
+.cursor-pointer { cursor: pointer; }
+.text-truncate { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.full-width { width: 100%; }
+.full-height { height: 100%; }
+
+/* ===== Transitions globales ===== */
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity var(--transition-speed) ease;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+}
+
+.slide-up-enter-active,
+.slide-up-leave-active {
+  transition: transform var(--transition-speed) ease, opacity var(--transition-speed) ease;
+}
+
+.slide-up-enter-from,
+.slide-up-leave-to {
+  transform: translateY(20px);
+  opacity: 0;
+}
+
+/* ===== Scrollbar custom ===== */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.2); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(0,0,0,0.4); }
