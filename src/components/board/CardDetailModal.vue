@@ -40,9 +40,9 @@
         </div>
 
         <!-- Labels -->
-        <div v-if="card.labels?.length" class="mb-4">
+        <div class="mb-4">
           <label class="text-caption text-medium-emphasis font-weight-semibold d-block mb-2">LABELS</label>
-          <div class="d-flex flex-wrap gap-1">
+          <div v-if="card.labels?.length" class="d-flex flex-wrap gap-1 mb-2">
             <v-chip
               v-for="label in card.labels"
               :key="label.id"
@@ -55,6 +55,27 @@
               {{ label.name }}
             </v-chip>
           </div>
+          <v-select
+            v-if="attachableLabels.length"
+            v-model="selectedLabel"
+            :items="attachableLabels"
+            item-title="name"
+            item-value="id"
+            placeholder="Ajouter un label..."
+            hide-details
+            clearable
+            @update:model-value="onAttachLabel"
+          >
+            <template #item="{ item, props: itemProps }">
+              <v-list-item v-bind="itemProps">
+                <template #prepend>
+                  <v-chip :color="item.raw.color" size="x-small" variant="flat" label class="mr-2">
+                    &nbsp;
+                  </v-chip>
+                </template>
+              </v-list-item>
+            </template>
+          </v-select>
         </div>
 
         <!-- Assignees -->
@@ -114,6 +135,7 @@
 <script setup>
 import { ref, computed, watch } from 'vue'
 import { useMemberStore } from '@/stores/member.store'
+import { useLabelStore  } from '@/stores/label.store'
 
 const model = defineModel({ type: Boolean, default: false })
 
@@ -122,16 +144,23 @@ const props = defineProps({
   saving:   { type: Boolean, default: false },
   deleting: { type: Boolean, default: false },
 })
-const emit = defineEmits(['save', 'delete', 'detach-label', 'unassign', 'assign'])
+const emit = defineEmits(['save', 'delete', 'detach-label', 'unassign', 'assign', 'attach-label'])
 
 const memberStore = useMemberStore()
+const labelStore  = useLabelStore()
 
 const assignableMembers = computed(() => {
   const assignedIds = new Set((props.card?.assignees || []).map(a => a.user_id))
   return memberStore.members.filter(m => !assignedIds.has(m.user_id))
 })
 
+const attachableLabels = computed(() => {
+  const attachedIds = new Set((props.card?.labels || []).map(l => l.id))
+  return labelStore.labels.filter(l => !attachedIds.has(l.id))
+})
+
 const selectedMember = ref(null)
+const selectedLabel  = ref(null)
 const form = ref({ title: '', description: '', due_date: null })
 
 watch(() => props.card, (c) => {
@@ -142,6 +171,7 @@ watch(() => props.card, (c) => {
       due_date:    c.due_date    || null,
     }
     selectedMember.value = null
+    selectedLabel.value  = null
   }
 }, { immediate: true })
 
@@ -149,6 +179,12 @@ function onAssign(userId) {
   if (!userId) return
   emit('assign', { card: props.card, userId })
   selectedMember.value = null
+}
+
+function onAttachLabel(labelId) {
+  if (!labelId) return
+  emit('attach-label', { card: props.card, labelId })
+  selectedLabel.value = null
 }
 
 function handleSave() {

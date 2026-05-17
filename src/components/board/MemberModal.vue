@@ -32,7 +32,7 @@
           >
             <template #prepend>
               <v-avatar color="primary" size="32">
-                <span class="text-caption text-white">{{ u.email[0].toUpperCase() }}</span>
+                <span class="text-caption text-white">{{ u.email?.[0]?.toUpperCase() ?? '?' }}</span>
               </v-avatar>
             </template>
             <template #append>
@@ -76,7 +76,7 @@
           >
             <template #prepend>
               <v-avatar color="primary" size="32">
-                <span class="text-caption text-white">{{ m.email[0].toUpperCase() }}</span>
+                <span class="text-caption text-white">{{ m.email?.[0]?.toUpperCase() ?? '?' }}</span>
               </v-avatar>
             </template>
             <template #append>

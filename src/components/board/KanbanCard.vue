@@ -4,8 +4,10 @@
     elevation="0"
     border
     class="kanban-card mb-2"
+    :class="{ 'is-dragging': isDragging }"
     draggable="true"
     @dragstart="onDragStart"
+    @dragend="isDragging = false"
     @click="$emit('open', card)"
   >
     <v-card-text class="pa-3">
@@ -58,6 +60,7 @@
 </template>
 
 <script setup>
+import { ref } from 'vue'
 import { formatDateShort, isDueSoon, isOverdue } from '@/utils/date'
 
 const props = defineProps({
@@ -66,7 +69,10 @@ const props = defineProps({
 })
 defineEmits(['open'])
 
+const isDragging = ref(false)
+
 function onDragStart(e) {
+  isDragging.value = true
   e.dataTransfer.setData('cardId',   String(props.card.id))
   e.dataTransfer.setData('columnId', String(props.columnId))
   e.dataTransfer.effectAllowed = 'move'
@@ -76,13 +82,19 @@ function onDragStart(e) {
 <style scoped>
 .kanban-card {
   cursor: grab;
-  transition: box-shadow 0.15s;
+  transition: box-shadow 0.15s ease, transform 0.15s ease, opacity 0.15s ease;
 }
 .kanban-card:hover {
-  box-shadow: 0 2px 8px rgba(0,0,0,0.12) !important;
+  box-shadow: 0 4px 16px rgba(99, 102, 241, 0.14), 0 1px 4px rgba(0,0,0,0.06) !important;
+  transform: translateY(-1px);
 }
 .kanban-card:active {
   cursor: grabbing;
+}
+.kanban-card.is-dragging {
+  opacity: 0.45;
+  transform: rotate(1.5deg) scale(0.98);
+  box-shadow: none !important;
 }
 .assignee-group {
   display: flex;

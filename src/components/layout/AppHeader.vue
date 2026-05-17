@@ -10,28 +10,11 @@
 
     <v-spacer />
 
-    <!-- Barre de recherche -->
-    <v-text-field
-      v-model="search"
-      placeholder="Rechercher..."
-      prepend-inner-icon="mdi-magnify"
-      variant="solo"
-      density="compact"
-      hide-details
-      class="mr-4 d-none d-sm-flex"
-      style="max-width: 280px"
-      rounded
-    />
-
-    <!-- Bouton thème -->
+<!-- Bouton thème -->
     <v-btn :icon="isDark ? 'mdi-weather-sunny' : 'mdi-weather-night'" @click="toggleTheme" />
 
     <!-- Menu notifications -->
-    <v-btn icon="mdi-bell-outline" class="mr-1">
-      <v-badge color="error" content="3" floating>
-        <v-icon>mdi-bell-outline</v-icon>
-      </v-badge>
-    </v-btn>
+    <v-btn icon="mdi-bell-outline" class="mr-1" />
 
     <!-- Menu utilisateur -->
     <v-menu min-width="200">
@@ -100,5 +83,4 @@ const appName   = APP_NAME
 const authStore = useAuthStore()
 const { isDark, toggleTheme } = useTheme()
 const { logout } = useAuth()
-const search = ref('')
 </script>

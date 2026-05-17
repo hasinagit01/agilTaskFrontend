@@ -1,7 +1,10 @@
 <template>
   <div
     class="kanban-column"
+    :class="{ 'drag-over': isDragOver }"
     @dragover.prevent
+    @dragenter="onDragEnter"
+    @dragleave="onDragLeave"
     @drop="onDrop"
   >
     <!-- En-tête de colonne -->
@@ -133,8 +136,22 @@ function cancelEditName() {
 }
 
 // Drag & drop
+const isDragOver = ref(false)
+let _dragCount   = 0
+
+function onDragEnter() {
+  _dragCount++
+  isDragOver.value = true
+}
+
+function onDragLeave() {
+  if (--_dragCount === 0) isDragOver.value = false
+}
+
 function onDrop(e) {
-  const cardId   = parseInt(e.dataTransfer.getData('cardId'))
+  _dragCount = 0
+  isDragOver.value = false
+  const cardId       = parseInt(e.dataTransfer.getData('cardId'))
   const fromColumnId = parseInt(e.dataTransfer.getData('columnId'))
   if (!cardId || fromColumnId === props.column.id) return
   emit('drop-card', { cardId, fromColumnId, toColumnId: props.column.id })
@@ -152,5 +169,10 @@ function onDrop(e) {
 }
 .cards-container {
   min-height: 8px;
+}
+.kanban-column.drag-over {
+  background: rgba(var(--v-theme-primary), 0.08);
+  outline: 2px dashed rgb(var(--v-theme-primary));
+  outline-offset: -2px;
 }
 </style>

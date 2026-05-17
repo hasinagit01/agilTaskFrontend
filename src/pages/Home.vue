@@ -15,9 +15,7 @@
       </div>
 
       <!-- Loader -->
-      <div v-if="boardStore.loading" class="d-flex justify-center py-12">
-        <v-progress-circular indeterminate color="primary" size="48" />
-      </div>
+      <SkeletonBoardGrid v-if="boardStore.loading" :count="4" />
 
       <!-- Grille de boards -->
       <v-row v-else-if="boardStore.boards.length">
@@ -131,9 +129,10 @@
 
 <script setup>
 import { ref, onMounted } from 'vue'
-import DefaultLayout from '@/layouts/DefaultLayout.vue'
-import BaseButton    from '@/components/common/BaseButton.vue'
-import BaseModal     from '@/components/common/BaseModal.vue'
+import DefaultLayout    from '@/layouts/DefaultLayout.vue'
+import BaseButton       from '@/components/common/BaseButton.vue'
+import BaseModal        from '@/components/common/BaseModal.vue'
+import SkeletonBoardGrid from '@/components/common/SkeletonBoardGrid.vue'
 import { useAuthStore }  from '@/stores/auth.store'
 import { useBoardStore } from '@/stores/board.store'
 import { formatDate } from '@/utils/date'

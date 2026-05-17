@@ -14,18 +14,34 @@
             <h1 class="text-h5 font-weight-bold">{{ boardStore.currentBoard?.name }}</h1>
           </div>
         </div>
-        <div class="d-flex gap-2">
+        <div class="header-actions">
+          <!-- Paramètres du board -->
+          <div class="header-actions__group">
+            <v-btn
+              v-if="isOwner"
+              variant="tonal"
+              size="small"
+              prepend-icon="mdi-account-group-outline"
+              @click="memberModalOpen = true"
+            >
+              Membres
+            </v-btn>
+            <v-btn
+              variant="tonal"
+              size="small"
+              prepend-icon="mdi-label-outline"
+              @click="labelModalOpen = true"
+            >
+              Labels
+            </v-btn>
+          </div>
+
+          <v-divider vertical class="header-actions__divider" />
+
+          <!-- Action principale -->
           <v-btn
-            v-if="isOwner"
-            variant="tonal"
-            size="small"
-            prepend-icon="mdi-account-group-outline"
-            @click="memberModalOpen = true"
-          >
-            Membres
-          </v-btn>
-          <v-btn
-            variant="outlined"
+            color="primary"
+            variant="flat"
             size="small"
             prepend-icon="mdi-plus"
             @click="openAddColumn"
@@ -36,9 +52,7 @@
       </div>
 
       <!-- Loader -->
-      <div v-if="loading" class="d-flex justify-center py-16">
-        <v-progress-circular indeterminate color="primary" size="48" />
-      </div>
+      <SkeletonKanban v-if="loading" />
 
       <!-- Kanban -->
       <div v-else class="kanban-scroll">
@@ -104,6 +118,7 @@
       @detach-label="handleDetachLabel"
       @unassign="handleUnassign"
       @assign="handleAssign"
+      @attach-label="handleAttachLabel"
     />
 
     <!-- Modal suppression carte -->
@@ -123,6 +138,12 @@
       v-model="memberModalOpen"
       :board-id="boardId"
     />
+
+    <!-- Modal labels -->
+    <LabelModal
+      v-model="labelModalOpen"
+      :board-id="boardId"
+    />
   </DefaultLayout>
 </template>
 
@@ -131,9 +152,11 @@ import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useRoute } from 'vue-router'
 import DefaultLayout   from '@/layouts/DefaultLayout.vue'
 import BaseModal       from '@/components/common/BaseModal.vue'
+import SkeletonKanban  from '@/components/common/SkeletonKanban.vue'
 import KanbanColumn    from '@/components/board/KanbanColumn.vue'
 import CardDetailModal from '@/components/board/CardDetailModal.vue'
 import MemberModal     from '@/components/board/MemberModal.vue'
+import LabelModal      from '@/components/board/LabelModal.vue'
 import { useBoardStore  } from '@/stores/board.store'
 import { useColumnStore } from '@/stores/column.store'
 import { useCardStore   } from '@/stores/card.store'
@@ -161,6 +184,7 @@ const isOwner = computed(() =>
 
 const loading         = ref(false)
 const memberModalOpen = ref(false)
+const labelModalOpen  = ref(false)
 
 // ===== Ajout colonne =====
 const addingColumn   = ref(false)
@@ -241,23 +265,33 @@ async function handleDeleteCard() {
 }
 
 // ===== Labels & Assignees =====
+function refreshSelectedCard(columnId, cardId) {
+  const updated = (cardStore.cardsByColumn[columnId] || []).find(c => c.id === cardId)
+  if (updated) selectedCard.value = updated
+}
+
 async function handleDetachLabel({ card, labelId }) {
   await labelService.detach(boardId.value, card.column_id, card.id, labelId)
-  // Recharger la carte pour mettre à jour les labels
   await cardStore.fetchCards(boardId.value, card.column_id)
-  cardDetailOpen.value = false
+  refreshSelectedCard(card.column_id, card.id)
 }
 
 async function handleUnassign({ card, userId }) {
   await assigneeService.unassign(boardId.value, card.column_id, card.id, userId)
   await cardStore.fetchCards(boardId.value, card.column_id)
-  cardDetailOpen.value = false
+  refreshSelectedCard(card.column_id, card.id)
 }
 
 async function handleAssign({ card, userId }) {
   await assigneeService.assign(boardId.value, card.column_id, card.id, userId)
   await cardStore.fetchCards(boardId.value, card.column_id)
-  cardDetailOpen.value = false
+  refreshSelectedCard(card.column_id, card.id)
+}
+
+async function handleAttachLabel({ card, labelId }) {
+  await labelService.attach(boardId.value, card.column_id, card.id, labelId)
+  await cardStore.fetchCards(boardId.value, card.column_id)
+  refreshSelectedCard(card.column_id, card.id)
 }
 
 // ===== Chargement initial =====
@@ -267,6 +301,7 @@ async function loadBoard() {
   await Promise.all([
     columnStore.fetchColumns(boardId.value),
     memberStore.fetchMembers(boardId.value),
+    labelStore.fetchLabels(boardId.value),
   ])
   await Promise.all(
     columnStore.columns.map(col => cardStore.fetchCards(boardId.value, col.id))
@@ -285,6 +320,19 @@ onUnmounted(() => {
 </script>
 
 <style scoped>
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.header-actions__group {
+  display: flex;
+  gap: 8px;
+}
+.header-actions__divider {
+  height: 24px;
+  align-self: center;
+}
 .board-detail {
   height: 100%;
   display: flex;

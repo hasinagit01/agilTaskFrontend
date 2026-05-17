@@ -21,10 +21,10 @@ export const useMemberStore = defineStore('member', () => {
 
   async function addMember(boardId, data) {
     try {
-      const result = await memberService.add(boardId, data)
-      members.value.push(result.data)
+      await memberService.add(boardId, data)
+      await fetchMembers(boardId)
       useNotificationStore().success('Membre ajouté')
-      return result.data
+      return true
     } catch (error) {
       useNotificationStore().error(error.message || 'Erreur lors de l\'ajout du membre')
       return null
