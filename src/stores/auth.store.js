@@ -12,11 +12,11 @@ export const useAuthStore = defineStore('auth', () => {
 
   // ===== Getters =====
   const isLoggedIn   = computed(() => !!token.value && !!user.value)
-  const isAdmin      = computed(() => user.value?.role === 'admin')
+  const isAdmin      = computed(() => false)
   const currentUser  = computed(() => user.value)
   const userInitials = computed(() => {
-    if (!user.value?.name) return '?'
-    return user.value.name.split(' ').map(n => n[0]).join('').toUpperCase()
+    if (!user.value?.email) return '?'
+    return user.value.email[0].toUpperCase()
   })
 
   // ===== Actions =====
@@ -73,13 +73,7 @@ export const useAuthStore = defineStore('auth', () => {
   }
 
   async function fetchCurrentUser() {
-    if (!token.value) return
-    try {
-      const data = await authService.me()
-      user.value = data.user
-    } catch {
-      clearAuth()
-    }
+    // L'utilisateur est reconstruit depuis le JWT stocké — pas d'endpoint /users/me
   }
 
   return {

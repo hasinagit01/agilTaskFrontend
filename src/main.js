@@ -3,7 +3,6 @@ import { createPinia } from 'pinia'
 import piniaPluginPersistedstate from 'pinia-plugin-persistedstate'
 import { createVuetify } from 'vuetify'
 import 'vuetify/styles'
-import '@mdi/font/css/materialdesignicons.css'
 import '@/assets/styles/main.css'
 
 import App from './App.vue'
@@ -42,10 +41,13 @@ const vuetify = createVuetify({
     },
   },
   defaults: {
-    VBtn: { rounded: 'lg' },
-    VCard: { rounded: 'lg' },
-    VTextField: { variant: 'outlined', density: 'comfortable' },
-    VSelect: { variant: 'outlined', density: 'comfortable' },
+    VBtn:      { rounded: 'lg' },
+    VCard:     { rounded: 'xl' },
+    VTextField: { variant: 'outlined', density: 'compact' },
+    VTextarea:  { variant: 'outlined', density: 'compact' },
+    VSelect:    { variant: 'outlined', density: 'compact' },
+    VList:      { density: 'compact', rounded: 'lg' },
+    VListItem:  { rounded: 'lg' },
   },
 })
 

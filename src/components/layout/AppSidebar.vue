@@ -30,7 +30,7 @@
         :to="item.to"
         :value="item.title"
         rounded="lg"
-        active-color="primary"
+        color="primary"
         class="mb-1"
       />
     </v-list>
@@ -48,7 +48,7 @@
           :to="item.to"
           :value="item.title"
           rounded="lg"
-          active-color="primary"
+          color="primary"
           class="mb-1"
         />
       </v-list>
@@ -58,14 +58,13 @@
     <template #append>
       <v-divider />
       <v-list-item
-        :prepend-avatar="currentUser?.avatar"
         :subtitle="currentUser?.email"
-        :title="currentUser?.name"
+        :title="currentUser?.email"
         nav
         class="py-3"
         :to="{ name: 'Profile' }"
       >
-        <template v-if="!currentUser?.avatar" #prepend>
+        <template #prepend>
           <v-avatar color="primary" size="32">
             <span class="text-caption text-white font-weight-bold">
               {{ authStore.userInitials }}
@@ -90,10 +89,10 @@ const isAdmin     = computed(() => authStore.isAdmin)
 const rail        = ref(false)
 
 const navItems = [
-  { title: 'Accueil',    icon: 'mdi-home-outline',        to: { name: 'Home' }     },
-  { title: 'À propos',   icon: 'mdi-information-outline', to: { name: 'About' }    },
-  { title: 'Profil',     icon: 'mdi-account-outline',     to: { name: 'Profile' }  },
-  { title: 'Paramètres', icon: 'mdi-cog-outline',         to: { name: 'Settings' } },
+  { title: 'Mes boards',  icon: 'mdi-view-kanban-outline', to: { name: 'Home' }     },
+  { title: 'Profil',      icon: 'mdi-account-outline',     to: { name: 'Profile' }  },
+  { title: 'Paramètres',  icon: 'mdi-cog-outline',         to: { name: 'Settings' } },
+  { title: 'À propos',    icon: 'mdi-information-outline', to: { name: 'About' }    },
 ]
 
 const adminItems = [

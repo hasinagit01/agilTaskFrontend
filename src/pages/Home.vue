@@ -1,134 +1,206 @@
 <template>
   <DefaultLayout>
     <div>
-      <!-- En-tête de page -->
+      <!-- En-tête -->
       <div class="d-flex align-center justify-space-between mb-6">
         <div>
-          <h1 class="text-h4 font-weight-bold">Tableau de bord</h1>
+          <h1 class="text-h4 font-weight-bold">Mes boards</h1>
           <p class="text-medium-emphasis mt-1">
-            Bonjour, {{ authStore.currentUser?.name }} 👋
+            Bienvenue, {{ authStore.currentUser?.email }}
           </p>
         </div>
-        <BaseButton prepend-icon="mdi-plus">
-          Nouvelle action
+        <BaseButton prepend-icon="mdi-plus" @click="openCreateDialog">
+          Nouveau board
         </BaseButton>
       </div>
 
-      <!-- Cartes stats -->
-      <v-row class="mb-6">
+      <!-- Loader -->
+      <div v-if="boardStore.loading" class="d-flex justify-center py-12">
+        <v-progress-circular indeterminate color="primary" size="48" />
+      </div>
+
+      <!-- Grille de boards -->
+      <v-row v-else-if="boardStore.boards.length">
         <v-col
-          v-for="stat in stats"
-          :key="stat.label"
+          v-for="board in boardStore.boards"
+          :key="board.id"
           cols="12"
           sm="6"
+          md="4"
           lg="3"
         >
-          <v-card rounded="xl" elevation="0" border>
+          <v-card
+            rounded="xl"
+            elevation="0"
+            border
+            class="board-card"
+            :to="`/boards/${board.id}`"
+          >
             <v-card-text class="pa-5">
-              <div class="d-flex align-center justify-space-between mb-3">
-                <span class="text-medium-emphasis text-body-2">{{ stat.label }}</span>
-                <v-avatar :color="stat.color" size="40" rounded="lg">
-                  <v-icon :icon="stat.icon" size="20" color="white" />
-                </v-avatar>
-              </div>
-              <div class="text-h4 font-weight-bold mb-1">{{ stat.value }}</div>
-              <div class="d-flex align-center gap-1">
-                <v-icon
-                  :icon="stat.trend > 0 ? 'mdi-trending-up' : 'mdi-trending-down'"
-                  :color="stat.trend > 0 ? 'success' : 'error'"
-                  size="16"
-                />
-                <span
-                  :class="stat.trend > 0 ? 'text-success' : 'text-error'"
-                  class="text-caption"
-                >
-                  {{ Math.abs(stat.trend) }}% ce mois
-                </span>
-              </div>
-            </v-card-text>
-          </v-card>
-        </v-col>
-      </v-row>
-
-      <!-- Contenu principal -->
-      <v-row>
-        <v-col cols="12" md="8">
-          <v-card rounded="xl" elevation="0" border>
-            <v-card-title class="pa-5 pb-0 font-weight-semibold">
-              Activité récente
-            </v-card-title>
-            <v-card-text>
-              <v-list lines="two">
-                <v-list-item
-                  v-for="activity in activities"
-                  :key="activity.id"
-                  :title="activity.title"
-                  :subtitle="activity.time"
-                  rounded="lg"
-                  class="mb-1"
-                >
-                  <template #prepend>
-                    <v-avatar :color="activity.color" size="36" rounded="lg">
-                      <v-icon :icon="activity.icon" size="18" color="white" />
-                    </v-avatar>
+              <div class="d-flex align-start justify-space-between">
+                <div class="flex-grow-1 mr-2">
+                  <v-avatar color="primary" size="40" rounded="lg" class="mb-3">
+                    <v-icon icon="mdi-view-kanban" size="22" color="white" />
+                  </v-avatar>
+                  <h3 class="text-body-1 font-weight-semibold mb-1">{{ board.name }}</h3>
+                  <p class="text-caption text-medium-emphasis">
+                    Créé le {{ formatDate(board.created_at) }}
+                  </p>
+                </div>
+                <v-menu>
+                  <template #activator="{ props }">
+                    <v-btn
+                      icon="mdi-dots-vertical"
+                      variant="text"
+                      size="small"
+                      v-bind="props"
+                      @click.prevent
+                    />
                   </template>
-                </v-list-item>
-              </v-list>
-            </v-card-text>
-          </v-card>
-        </v-col>
-
-        <v-col cols="12" md="4">
-          <v-card rounded="xl" elevation="0" border>
-            <v-card-title class="pa-5 pb-0 font-weight-semibold">
-              Accès rapide
-            </v-card-title>
-            <v-card-text>
-              <v-list rounded="lg">
-                <v-list-item
-                  v-for="link in quickLinks"
-                  :key="link.title"
-                  :prepend-icon="link.icon"
-                  :title="link.title"
-                  :to="link.to"
-                  active-color="primary"
-                  rounded="lg"
-                  class="mb-1"
-                />
-              </v-list>
+                  <v-list density="compact" rounded="lg">
+                    <v-list-item
+                      prepend-icon="mdi-pencil-outline"
+                      title="Renommer"
+                      @click="openRenameDialog(board)"
+                    />
+                    <v-list-item
+                      prepend-icon="mdi-delete-outline"
+                      title="Supprimer"
+                      class="text-error"
+                      @click="openDeleteDialog(board)"
+                    />
+                  </v-list>
+                </v-menu>
+              </div>
             </v-card-text>
           </v-card>
         </v-col>
       </v-row>
+
+      <!-- État vide -->
+      <div v-else class="text-center py-16">
+        <v-icon icon="mdi-view-kanban-outline" size="72" color="medium-emphasis" class="mb-4" />
+        <h3 class="text-h6 text-medium-emphasis mb-2">Aucun board pour l'instant</h3>
+        <p class="text-body-2 text-medium-emphasis mb-6">
+          Créez votre premier board pour commencer à organiser vos tâches.
+        </p>
+        <BaseButton prepend-icon="mdi-plus" @click="openCreateDialog">
+          Créer un board
+        </BaseButton>
+      </div>
     </div>
+
+    <!-- Dialog création -->
+    <BaseModal v-model="createDialog" title="Nouveau board" @confirm="handleCreate" :loading="saving">
+      <v-text-field
+        v-model="boardName"
+        label="Nom du board"
+        variant="outlined"
+        autofocus
+        :rules="[v => !!v || 'Requis', v => v.length >= 2 || 'Minimum 2 caractères']"
+        @keyup.enter="handleCreate"
+      />
+    </BaseModal>
+
+    <!-- Dialog renommage -->
+    <BaseModal v-model="renameDialog" title="Renommer le board" @confirm="handleRename" :loading="saving">
+      <v-text-field
+        v-model="boardName"
+        label="Nouveau nom"
+        variant="outlined"
+        autofocus
+        :rules="[v => !!v || 'Requis', v => v.length >= 2 || 'Minimum 2 caractères']"
+        @keyup.enter="handleRename"
+      />
+    </BaseModal>
+
+    <!-- Dialog suppression -->
+    <BaseModal
+      v-model="deleteDialog"
+      title="Supprimer le board"
+      confirm-text="Supprimer"
+      confirm-color="error"
+      @confirm="handleDelete"
+      :loading="saving"
+    >
+      <p>Êtes-vous sûr de vouloir supprimer <strong>{{ selectedBoard?.name }}</strong> ?<br>
+      Cette action est irréversible.</p>
+    </BaseModal>
   </DefaultLayout>
 </template>
 
 <script setup>
+import { ref, onMounted } from 'vue'
 import DefaultLayout from '@/layouts/DefaultLayout.vue'
 import BaseButton    from '@/components/common/BaseButton.vue'
-import { useAuthStore } from '@/stores/auth.store'
+import BaseModal     from '@/components/common/BaseModal.vue'
+import { useAuthStore }  from '@/stores/auth.store'
+import { useBoardStore } from '@/stores/board.store'
 
-const authStore = useAuthStore()
+const authStore  = useAuthStore()
+const boardStore = useBoardStore()
 
-const stats = [
-  { label: 'Utilisateurs',  value: '1 284', icon: 'mdi-account-group', color: 'primary',  trend:  12 },
-  { label: 'Ventes',        value: '48 290', icon: 'mdi-cart',          color: 'success',  trend:   8 },
-  { label: 'Commandes',     value: '384',    icon: 'mdi-package',       color: 'warning',  trend:  -3 },
-  { label: 'Revenus (€)',   value: '9 432',  icon: 'mdi-currency-eur',  color: 'info',     trend:  21 },
-]
+const createDialog = ref(false)
+const renameDialog = ref(false)
+const deleteDialog = ref(false)
+const boardName    = ref('')
+const selectedBoard = ref(null)
+const saving       = ref(false)
 
-const activities = [
-  { id: 1, title: 'Nouvel utilisateur inscrit',    time: 'il y a 5 min',  icon: 'mdi-account-plus',  color: 'primary' },
-  { id: 2, title: 'Commande #4821 validée',        time: 'il y a 18 min', icon: 'mdi-check-circle',  color: 'success' },
-  { id: 3, title: 'Paiement reçu — 129 €',         time: 'il y a 1h',    icon: 'mdi-cash',          color: 'info'    },
-  { id: 4, title: 'Ticket support #312 résolu',    time: 'il y a 2h',    icon: 'mdi-headset',       color: 'warning' },
-  { id: 5, title: 'Mise à jour système déployée',  time: 'il y a 4h',    icon: 'mdi-update',        color: 'secondary'},
-]
+function formatDate(iso) {
+  return new Date(iso).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short', year: 'numeric' })
+}
 
-const quickLinks = [
-  { title: 'Mon profil',     icon: 'mdi-account-circle-outline', to: { name: 'Profile'  } },
-  { title: 'Paramètres',    icon: 'mdi-cog-outline',             to: { name: 'Settings' } },
-  { title: 'À propos',      icon: 'mdi-information-outline',     to: { name: 'About'    } },
-]
+function openCreateDialog() {
+  boardName.value = ''
+  createDialog.value = true
+}
+
+function openRenameDialog(board) {
+  selectedBoard.value = board
+  boardName.value = board.name
+  renameDialog.value = true
+}
+
+function openDeleteDialog(board) {
+  selectedBoard.value = board
+  deleteDialog.value = true
+}
+
+async function handleCreate() {
+  if (!boardName.value || boardName.value.length < 2) return
+  saving.value = true
+  await boardStore.createBoard(boardName.value.trim())
+  saving.value = false
+  createDialog.value = false
+}
+
+async function handleRename() {
+  if (!boardName.value || boardName.value.length < 2) return
+  saving.value = true
+  await boardStore.updateBoard(selectedBoard.value.id, boardName.value.trim())
+  saving.value = false
+  renameDialog.value = false
+}
+
+async function handleDelete() {
+  saving.value = true
+  await boardStore.removeBoard(selectedBoard.value.id)
+  saving.value = false
+  deleteDialog.value = false
+}
+
+onMounted(() => boardStore.fetchBoards())
 </script>
+
+<style scoped>
+.board-card {
+  transition: transform 0.15s, box-shadow 0.15s;
+  cursor: pointer;
+  text-decoration: none;
+}
+.board-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(0,0,0,0.1) !important;
+}
+</style>

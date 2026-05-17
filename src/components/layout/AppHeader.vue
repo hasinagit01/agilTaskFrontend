@@ -48,7 +48,7 @@
       <v-list rounded="lg" elevation="3">
         <v-list-item
           :subtitle="authStore.currentUser?.email"
-          :title="authStore.currentUser?.name"
+          :title="authStore.currentUser?.email"
           class="mb-1"
         >
           <template #prepend>
@@ -88,6 +88,7 @@
 </template>
 
 <script setup>
+import { ref } from 'vue'
 import { useAuthStore } from '@/stores/auth.store'
 import { useTheme }     from '@/composables/useTheme'
 import { useAuth }      from '@/composables/useAuth'
@@ -99,4 +100,5 @@ const appName   = APP_NAME
 const authStore = useAuthStore()
 const { isDark, toggleTheme } = useTheme()
 const { logout } = useAuth()
+const search = ref('')
 </script>

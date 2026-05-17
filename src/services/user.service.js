@@ -1,10 +1,10 @@
 import api from './api'
 
 export const userService = {
-  /**
-   * Liste tous les utilisateurs (admin)
-   * @param {{ page?: number, limit?: number, search?: string }} params
-   */
+  async search(query) {
+    return api.get('/users/search', { params: { q: query } })
+  },
+
   async getAll(params = {}) {
     return api.get('/users', { params })
   },
