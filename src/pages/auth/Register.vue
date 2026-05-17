@@ -11,36 +11,29 @@
           </p>
         </div>
 
-        <v-form ref="formRef" @submit.prevent="handleRegister">
+        <v-form @submit.prevent="onSubmit">
           <BaseInput
-            v-model="form.name"
-            label="Nom complet"
-            prepend-icon="mdi-account-outline"
-            :rules="[rules.required, rules.minLength(2)]"
-            class="mb-3"
-          />
-          <BaseInput
-            v-model="form.email"
+            v-model="email"
+            v-bind="emailProps"
             label="Email"
             type="email"
             prepend-icon="mdi-email-outline"
-            :rules="[rules.required, rules.email]"
             class="mb-3"
           />
           <BaseInput
-            v-model="form.password"
+            v-model="password"
+            v-bind="passwordProps"
             label="Mot de passe"
             type="password"
             prepend-icon="mdi-lock-outline"
-            :rules="[rules.required, rules.password]"
             class="mb-3"
           />
           <BaseInput
-            v-model="form.confirmPassword"
+            v-model="confirmPassword"
+            v-bind="confirmPasswordProps"
             label="Confirmer le mot de passe"
             type="password"
             prepend-icon="mdi-lock-check-outline"
-            :rules="[rules.required, rules.confirmPassword(form.password)]"
             class="mb-2"
           />
 
@@ -84,23 +77,30 @@
 </template>
 
 <script setup>
-import { ref, reactive } from 'vue'
+import { ref } from 'vue'
+import { useForm } from 'vee-validate'
+import { toTypedSchema } from '@vee-validate/zod'
 import AuthLayout from '@/layouts/AuthLayout.vue'
 import BaseInput  from '@/components/common/BaseInput.vue'
 import BaseButton from '@/components/common/BaseButton.vue'
-import { useAuth }from '@/composables/useAuth'
-import { rules }  from '@/utils/validators'
+import { useAuth } from '@/composables/useAuth'
+import { registerSchema } from '@/schemas/auth.schema'
 
 const { register, loading } = useAuth()
-const formRef     = ref(null)
 const acceptTerms = ref(false)
 
-const form = reactive({ name: '', email: '', password: '', confirmPassword: '' })
+const { defineField, handleSubmit } = useForm({
+  validationSchema: toTypedSchema(registerSchema),
+})
 
-async function handleRegister() {
-  const { valid } = await formRef.value.validate()
-  if (!valid || !acceptTerms.value) return
-  const { name, email, password } = form
-  await register({ name, email, password })
-}
+const vuetifyConfig = (state) => ({ props: { 'error-messages': state.errors } })
+
+const [email,           emailProps]           = defineField('email',           vuetifyConfig)
+const [password,        passwordProps]        = defineField('password',        vuetifyConfig)
+const [confirmPassword, confirmPasswordProps] = defineField('confirmPassword', vuetifyConfig)
+
+const onSubmit = handleSubmit(async (values) => {
+  if (!acceptTerms.value) return
+  await register({ email: values.email, password: values.password })
+})
 </script>

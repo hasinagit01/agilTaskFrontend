@@ -11,21 +11,21 @@
           </p>
         </div>
 
-        <v-form ref="formRef" @submit.prevent="handleLogin">
+        <v-form @submit.prevent="onSubmit">
           <BaseInput
-            v-model="form.email"
+            v-model="email"
+            v-bind="emailProps"
             label="Email"
             type="email"
             prepend-icon="mdi-email-outline"
-            :rules="[rules.required, rules.email]"
             class="mb-3"
           />
           <BaseInput
-            v-model="form.password"
+            v-model="password"
+            v-bind="passwordProps"
             label="Mot de passe"
             type="password"
             prepend-icon="mdi-lock-outline"
-            :rules="[rules.required, rules.minLength(6)]"
             class="mb-1"
           />
 
@@ -62,21 +62,26 @@
 </template>
 
 <script setup>
-import { ref, reactive } from 'vue'
+import { useForm } from 'vee-validate'
+import { toTypedSchema } from '@vee-validate/zod'
 import AuthLayout from '@/layouts/AuthLayout.vue'
 import BaseInput  from '@/components/common/BaseInput.vue'
 import BaseButton from '@/components/common/BaseButton.vue'
-import { useAuth }from '@/composables/useAuth'
-import { rules }  from '@/utils/validators'
+import { useAuth } from '@/composables/useAuth'
+import { loginSchema } from '@/schemas/auth.schema'
 
 const { login, loading } = useAuth()
-const formRef = ref(null)
 
-const form = reactive({ email: '', password: '' })
+const { defineField, handleSubmit } = useForm({
+  validationSchema: toTypedSchema(loginSchema),
+})
 
-async function handleLogin() {
-  const { valid } = await formRef.value.validate()
-  if (!valid) return
-  await login(form)
-}
+const vuetifyConfig = (state) => ({ props: { 'error-messages': state.errors } })
+
+const [email, emailProps]       = defineField('email',    vuetifyConfig)
+const [password, passwordProps] = defineField('password', vuetifyConfig)
+
+const onSubmit = handleSubmit(async (values) => {
+  await login(values)
+})
 </script>

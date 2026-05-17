@@ -1,86 +1,29 @@
-import { STORAGE_KEYS } from '@/constants'
+import api from './api.js'
 
-const MOCK_USERS_KEY = 'mock_users'
-const MOCK_DELAY = 600
-
-function delay(ms) {
-  return new Promise(resolve => setTimeout(resolve, ms))
-}
-
-function getMockUsers() {
-  return JSON.parse(localStorage.getItem(MOCK_USERS_KEY) || '[]')
-}
-
-function saveMockUsers(users) {
-  localStorage.setItem(MOCK_USERS_KEY, JSON.stringify(users))
-}
-
-function generateToken(user) {
-  return btoa(JSON.stringify({ id: user.id, email: user.email, exp: Date.now() + 86400000 }))
-}
-
-// Compte admin par défaut toujours disponible
-const DEFAULT_ADMIN = {
-  id: 1,
-  name: 'Admin',
-  email: 'admin@demo.com',
-  password: 'Admin123',
-  role: 'admin',
+function decodeJWT(token) {
+  try {
+    const payload = token.split('.')[1]
+    return JSON.parse(atob(payload))
+  } catch {
+    return null
+  }
 }
 
 export const authService = {
   async login({ email, password }) {
-    await delay(MOCK_DELAY)
-
-    const allUsers = [DEFAULT_ADMIN, ...getMockUsers()]
-    const found = allUsers.find(u => u.email === email && u.password === password)
-
-    if (!found) {
-      return Promise.reject({ message: 'Email ou mot de passe incorrect.' })
-    }
-
-    const { password: _pwd, ...user } = found
-    return { user, token: generateToken(user) }
+    const result = await api.post('/auth/login', { email, password })
+    const access_token = result.data.access_token
+    const payload = decodeJWT(access_token)
+    const user = { id: parseInt(payload.sub), email: payload.email }
+    return { user, token: access_token }
   },
 
-  async register({ name, email, password }) {
-    await delay(MOCK_DELAY)
-
-    const allUsers = [DEFAULT_ADMIN, ...getMockUsers()]
-    if (allUsers.find(u => u.email === email)) {
-      return Promise.reject({ message: 'Cet email est déjà utilisé.' })
-    }
-
-    const user = { id: Date.now(), name, email, role: 'user' }
-    saveMockUsers([...getMockUsers(), { ...user, password }])
-    return { user, token: generateToken(user) }
+  async register({ email, password }) {
+    await api.post('/auth/register', { email, password })
+    return authService.login({ email, password })
   },
 
   async logout() {
-    await delay(200)
-    return {}
-  },
-
-  async me() {
-    await delay(200)
-    const raw = localStorage.getItem(STORAGE_KEYS.AUTH_STORE)
-    if (!raw) return Promise.reject({ message: 'Non authentifié.' })
-    const { user } = JSON.parse(raw)
-    if (!user) return Promise.reject({ message: 'Non authentifié.' })
-    return { user }
-  },
-
-  async forgotPassword({ email }) {
-    await delay(MOCK_DELAY)
-    const allUsers = [DEFAULT_ADMIN, ...getMockUsers()]
-    if (!allUsers.find(u => u.email === email)) {
-      return Promise.reject({ message: 'Aucun compte associé à cet email.' })
-    }
-    return {}
-  },
-
-  async resetPassword(_data) {
-    await delay(MOCK_DELAY)
     return {}
   },
 }

@@ -2,13 +2,15 @@ import { createRouter, createWebHistory } from 'vue-router'
 import { useAuthStore } from '@/stores/auth.store'
 
 // Lazy loading des pages
-const Home     = () => import('@/pages/Home.vue')
-const About    = () => import('@/pages/About.vue')
-const Login    = () => import('@/pages/auth/Login.vue')
-const Register = () => import('@/pages/auth/Register.vue')
-const Profile  = () => import('@/pages/Profile.vue')
-const Settings = () => import('@/pages/Settings.vue')
-const NotFound = () => import('@/pages/NotFound.vue')
+const Home        = () => import('@/pages/Home.vue')
+const BoardDetail = () => import('@/pages/BoardDetail.vue')
+const About       = () => import('@/pages/About.vue')
+const Login       = () => import('@/pages/auth/Login.vue')
+const Register    = () => import('@/pages/auth/Register.vue')
+const Profile     = () => import('@/pages/Profile.vue')
+const Settings    = () => import('@/pages/Settings.vue')
+const NotFound    = () => import('@/pages/NotFound.vue')
+const ErrorPage   = () => import('@/pages/Error.vue')
 
 const routes = [
   // ===== Routes publiques =====
@@ -30,6 +32,12 @@ const routes = [
     path: '/',
     name: 'Home',
     component: Home,
+    meta: { requiresAuth: true },
+  },
+  {
+    path: '/boards/:id',
+    name: 'BoardDetail',
+    component: BoardDetail,
     meta: { requiresAuth: true },
   },
   {
@@ -64,7 +72,12 @@ const routes = [
     meta: { requiresAuth: true, requiresAdmin: true },
   },
 
-  // ===== 404 =====
+  // ===== Pages d'erreur =====
+  {
+    path: '/error',
+    name: 'Error',
+    component: ErrorPage,
+  },
   {
     path: '/:pathMatch(.*)*',
     name: 'NotFound',

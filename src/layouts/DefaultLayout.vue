@@ -9,9 +9,7 @@
     <!-- Contenu principal -->
     <v-main>
       <v-container fluid class="pa-6">
-        <transition name="fade" mode="out-in">
-          <slot />
-        </transition>
+        <slot />
       </v-container>
     </v-main>
 

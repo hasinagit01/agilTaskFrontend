@@ -3,6 +3,9 @@ import { HTTP_STATUS } from '@/constants'
 import router from '@/router'
 import { useAuthStore } from '@/stores/auth.store'
 
+// Verrou pour éviter plusieurs redirections simultanées vers /login (ex: appels parallèles tous en 401)
+let _redirectingToLogin = false
+
 // Instance Axios principale
 const api = axios.create({
   baseURL: import.meta.env.VITE_API_URL,
@@ -32,18 +35,38 @@ api.interceptors.response.use(
     const status = error.response?.status
 
     if (status === HTTP_STATUS.UNAUTHORIZED) {
-      const authStore = useAuthStore()
-      authStore.clearAuth()
-      router.push('/login')
+      if (!_redirectingToLogin) {
+        _redirectingToLogin = true
+        const authStore = useAuthStore()
+        authStore.clearAuth()
+        await router.replace({ name: 'Login' })
+        _redirectingToLogin = false
+      }
+      // Retourne une promesse en attente pour stopper la chaîne d'appels
+      // (le composant sera détruit par la navigation, pas besoin de rejeter)
+      return new Promise(() => {})
     }
 
     if (status === HTTP_STATUS.FORBIDDEN) {
-      router.push('/')
+      router.push({ name: 'Error', query: { code: 403 } })
+    }
+
+    if (status === HTTP_STATUS.NOT_FOUND) {
+      router.push({ name: 'NotFound' })
+    }
+
+    if (status === HTTP_STATUS.SERVER_ERROR || status >= 500) {
+      router.push({ name: 'Error', query: { code: 500 } })
+    }
+
+    if (!error.response) {
+      // Pas de réponse du serveur : timeout ou réseau coupé
+      router.push({ name: 'Error', query: { code: 'network' } })
     }
 
     return Promise.reject({
       status,
-      message: error.response?.data?.message || 'Erreur inconnue',
+      message: error.response?.data?.error || error.response?.data?.message || 'Erreur inconnue',
       data: error.response?.data || null,
     })
   },

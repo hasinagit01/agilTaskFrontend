@@ -62,32 +62,9 @@
               Sécurité
             </v-card-title>
             <v-card-text class="px-5 pb-5">
-              <v-form ref="passwordForm" @submit.prevent="changePassword">
-                <BaseInput
-                  v-model="passwords.current"
-                  label="Mot de passe actuel"
-                  type="password"
-                  :rules="[rules.required]"
-                  class="mb-2"
-                />
-                <BaseInput
-                  v-model="passwords.new"
-                  label="Nouveau mot de passe"
-                  type="password"
-                  :rules="[rules.required, rules.password]"
-                  class="mb-2"
-                />
-                <BaseInput
-                  v-model="passwords.confirm"
-                  label="Confirmer le nouveau mot de passe"
-                  type="password"
-                  :rules="[rules.required, rules.confirmPassword(passwords.new)]"
-                  class="mb-4"
-                />
-                <BaseButton type="submit" :loading="changingPwd" block prepend-icon="mdi-lock-reset">
-                  Changer le mot de passe
-                </BaseButton>
-              </v-form>
+              <v-alert type="info" variant="tonal" icon="mdi-information-outline" density="compact">
+                Le changement de mot de passe n'est pas disponible dans cette version.
+              </v-alert>
             </v-card-text>
           </v-card>
 
@@ -125,18 +102,13 @@
 <script setup>
 import { ref, reactive, computed } from 'vue'
 import DefaultLayout from '@/layouts/DefaultLayout.vue'
-import BaseInput     from '@/components/common/BaseInput.vue'
 import BaseButton    from '@/components/common/BaseButton.vue'
 import BaseModal     from '@/components/common/BaseModal.vue'
 import { useTheme }  from '@/composables/useTheme'
 import { useAuth }   from '@/composables/useAuth'
-import { useNotificationStore } from '@/stores/notification.store'
-import { rules }     from '@/utils/validators'
-import { MESSAGES }  from '@/constants'
 
 const { isDark, setTheme } = useTheme()
 const { logout } = useAuth()
-const notifStore = useNotificationStore()
 
 const darkMode = computed({
   get: () => isDark.value,
@@ -144,10 +116,6 @@ const darkMode = computed({
 })
 const selectedColor = ref('primary')
 const deleteDialog  = ref(false)
-const changingPwd   = ref(false)
-const passwordForm  = ref(null)
-
-const passwords = reactive({ current: '', new: '', confirm: '' })
 
 const colorOptions = [
   { value: 'primary' }, { value: 'purple' }, { value: 'teal' },
@@ -166,21 +134,4 @@ function handleDeleteAccount() {
   logout()
 }
 
-async function changePassword() {
-  const { valid } = await passwordForm.value.validate()
-  if (!valid) return
-  changingPwd.value = true
-  try {
-    await new Promise(r => setTimeout(r, 800))
-    notifStore.success('Mot de passe modifié avec succès.')
-    passwords.current = ''
-    passwords.new     = ''
-    passwords.confirm = ''
-    passwordForm.value.reset()
-  } catch {
-    notifStore.error(MESSAGES.ERROR_GENERIC)
-  } finally {
-    changingPwd.value = false
-  }
-}
 </script>
