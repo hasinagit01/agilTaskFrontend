@@ -23,14 +23,14 @@ html {
 }
 
 body {
-  font-family: 'Inter', 'Roboto', sans-serif;
+  font-family: 'Plus Jakarta Sans', 'Roboto', sans-serif;
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
 .v-application {
-  font-family: 'Inter', 'Roboto', sans-serif !important;
+  font-family: 'Plus Jakarta Sans', 'Roboto', sans-serif !important;
 }
 
 /* ===== Utilitaires ===== */
