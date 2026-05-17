@@ -1,5 +1,5 @@
 <template>
-  <v-dialog v-model="model" max-width="600" scrollable>
+  <v-dialog v-model="model" max-width="600" scrollable persistent>
     <v-card v-if="card">
       <v-card-title class="d-flex align-center justify-space-between pa-4">
         <span class="text-h6 font-weight-semibold">Détail de la carte</span>
@@ -186,15 +186,6 @@ function onAttachLabel(labelId) {
   emit('attach-label', { card: props.card, labelId })
   selectedLabel.value = null
 }
-
-const isDirty = computed(() => {
-  if (!props.card) return false
-  return form.value.title       !== (props.card.title       || '')   ||
-         form.value.description !== (props.card.description || '')   ||
-         form.value.due_date    !== (props.card.due_date    || null)
-})
-
-defineExpose({ isDirty })
 
 function handleSave() {
   if (!form.value.title.trim()) return

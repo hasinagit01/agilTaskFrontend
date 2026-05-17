@@ -112,7 +112,6 @@
 
     <!-- Modal détail carte -->
     <CardDetailModal
-      ref="cardDetailModalRef"
       v-model="cardDetailOpen"
       :card="selectedCard"
       :saving="savingCard"
@@ -207,13 +206,11 @@ const labelModalOpen  = ref(false)
 
 // ===== Guard de navigation =====
 const leaveConfirmOpen = ref(false)
-const cardDetailModalRef = ref(null)
 let   pendingRoute     = null
 let   leaveApproved    = false
 
 const hasUnsavedChanges = computed(() =>
-  (addingColumn.value && newColumnName.value.trim().length > 0) ||
-  (cardDetailOpen.value && cardDetailModalRef.value?.isDirty)
+  addingColumn.value && newColumnName.value.trim().length > 0
 )
 
 onBeforeRouteLeave((to) => {
