@@ -159,7 +159,7 @@ function onDrop(e) {
 
 <style scoped>
 .kanban-column {
-  background: rgba(var(--v-theme-surface-variant), 0.4);
+  background: rgba(var(--v-theme-primary), 0.06);
   border-radius: 12px;
   padding: 12px;
   min-width: 280px;
@@ -168,6 +168,13 @@ function onDrop(e) {
 }
 .cards-container {
   min-height: 8px;
+}
+
+@media (max-width: 600px) {
+  .kanban-column {
+    width: 100%;
+    min-width: unset;
+  }
 }
 .kanban-column.drag-over {
   background: rgba(var(--v-theme-primary), 0.08);

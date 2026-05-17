@@ -1,5 +1,5 @@
 <template>
-  <v-navigation-drawer v-model="model" :rail="rail" permanent>
+  <v-navigation-drawer v-model="model" :rail="!mobile && rail" :temporary="mobile" :permanent="!mobile">
     <!-- Logo + toggle rail -->
     <v-list-item
       :title="rail ? '' : APP_NAME"
@@ -78,11 +78,13 @@
 
 <script setup>
 import { ref, computed } from 'vue'
+import { useDisplay } from 'vuetify'
 import { useAuthStore } from '@/stores/auth.store'
 import { APP_NAME }     from '@/constants'
 
 const model = defineModel({ type: Boolean, default: true })
 
+const { mobile }  = useDisplay()
 const authStore   = useAuthStore()
 const currentUser = computed(() => authStore.currentUser)
 const isAdmin     = computed(() => authStore.isAdmin)

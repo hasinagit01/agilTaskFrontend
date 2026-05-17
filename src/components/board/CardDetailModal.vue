@@ -187,6 +187,15 @@ function onAttachLabel(labelId) {
   selectedLabel.value = null
 }
 
+const isDirty = computed(() => {
+  if (!props.card) return false
+  return form.value.title       !== (props.card.title       || '')   ||
+         form.value.description !== (props.card.description || '')   ||
+         form.value.due_date    !== (props.card.due_date    || null)
+})
+
+defineExpose({ isDirty })
+
 function handleSave() {
   if (!form.value.title.trim()) return
   emit('save', { card: props.card, data: { ...form.value } })

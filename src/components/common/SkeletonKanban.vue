@@ -1,5 +1,5 @@
 <template>
-  <div class="d-flex gap-3">
+  <div class="skeleton-wrapper">
     <div
       v-for="(cardCount, i) in layout"
       :key="i"
@@ -30,6 +30,10 @@ const layout = computed(() =>
 </script>
 
 <style scoped>
+.skeleton-wrapper {
+  display: flex;
+  gap: 12px;
+}
 .skeleton-column {
   background: rgba(var(--v-theme-surface-variant), 0.4);
   border-radius: 12px;
@@ -39,5 +43,15 @@ const layout = computed(() =>
 }
 .skeleton-card {
   background: rgba(var(--v-theme-surface), 0.9);
+}
+
+@media (max-width: 600px) {
+  .skeleton-wrapper {
+    flex-direction: column;
+  }
+  .skeleton-column {
+    width: 100%;
+    min-width: unset;
+  }
 }
 </style>

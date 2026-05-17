@@ -21,18 +21,20 @@
               v-if="isOwner"
               variant="tonal"
               size="small"
-              prepend-icon="mdi-account-group-outline"
+              :icon="mobile ? 'mdi-account-group-outline' : undefined"
+              :prepend-icon="mobile ? undefined : 'mdi-account-group-outline'"
               @click="memberModalOpen = true"
             >
-              Membres
+              <span class="d-none d-sm-inline">Membres</span>
             </v-btn>
             <v-btn
               variant="tonal"
               size="small"
-              prepend-icon="mdi-label-outline"
+              :icon="mobile ? 'mdi-label-outline' : undefined"
+              :prepend-icon="mobile ? undefined : 'mdi-label-outline'"
               @click="labelModalOpen = true"
             >
-              Labels
+              <span class="d-none d-sm-inline">Labels</span>
             </v-btn>
           </div>
 
@@ -43,10 +45,11 @@
             color="primary"
             variant="flat"
             size="small"
-            prepend-icon="mdi-plus"
+            :icon="mobile ? 'mdi-plus' : undefined"
+            :prepend-icon="mobile ? undefined : 'mdi-plus'"
             @click="openAddColumn"
           >
-            Ajouter une colonne
+            <span class="d-none d-sm-inline">Ajouter une colonne</span>
           </v-btn>
         </div>
       </div>
@@ -109,6 +112,7 @@
 
     <!-- Modal détail carte -->
     <CardDetailModal
+      ref="cardDetailModalRef"
       v-model="cardDetailOpen"
       :card="selectedCard"
       :saving="savingCard"
@@ -144,12 +148,25 @@
       v-model="labelModalOpen"
       :board-id="boardId"
     />
+
+    <!-- Confirmation quitter sans sauvegarder -->
+    <BaseModal
+      v-model="leaveConfirmOpen"
+      title="Modifications non sauvegardées"
+      confirm-text="Quitter"
+      confirm-color="error"
+      @confirm="handleLeaveConfirm"
+      @update:model-value="handleLeaveCancel"
+    >
+      <p>Vous avez des modifications non sauvegardées. Êtes-vous sûr de vouloir quitter cette page ?</p>
+    </BaseModal>
   </DefaultLayout>
 </template>
 
 <script setup>
 import { ref, computed, onMounted, onUnmounted } from 'vue'
-import { useRoute } from 'vue-router'
+import { useDisplay } from 'vuetify'
+import { useRoute, useRouter, onBeforeRouteLeave } from 'vue-router'
 import DefaultLayout   from '@/layouts/DefaultLayout.vue'
 import BaseModal       from '@/components/common/BaseModal.vue'
 import SkeletonKanban  from '@/components/common/SkeletonKanban.vue'
@@ -166,7 +183,9 @@ import { useAuthStore   } from '@/stores/auth.store'
 import { labelService   } from '@/services/label.service'
 import { assigneeService } from '@/services/assignee.service'
 
+const { mobile } = useDisplay()
 const route   = useRoute()
+const router  = useRouter()
 const boardId = computed(() => parseInt(route.params.id))
 
 const boardStore  = useBoardStore()
@@ -185,6 +204,38 @@ const isOwner = computed(() =>
 const loading         = ref(false)
 const memberModalOpen = ref(false)
 const labelModalOpen  = ref(false)
+
+// ===== Guard de navigation =====
+const leaveConfirmOpen = ref(false)
+const cardDetailModalRef = ref(null)
+let   pendingRoute     = null
+let   leaveApproved    = false
+
+const hasUnsavedChanges = computed(() =>
+  (addingColumn.value && newColumnName.value.trim().length > 0) ||
+  (cardDetailOpen.value && cardDetailModalRef.value?.isDirty)
+)
+
+onBeforeRouteLeave((to) => {
+  if (!leaveApproved && hasUnsavedChanges.value) {
+    pendingRoute = to
+    leaveConfirmOpen.value = true
+    return false
+  }
+})
+
+async function handleLeaveConfirm() {
+  leaveApproved = true
+  leaveConfirmOpen.value = false
+  await router.push(pendingRoute)
+  leaveApproved = false
+  pendingRoute  = null
+}
+
+function handleLeaveCancel() {
+  leaveConfirmOpen.value = false
+  pendingRoute = null
+}
 
 // ===== Ajout colonne =====
 const addingColumn   = ref(false)
@@ -356,5 +407,19 @@ onUnmounted(() => {
   min-width: 280px;
   width: 280px;
   flex-shrink: 0;
+}
+
+@media (max-width: 600px) {
+  .kanban-scroll {
+    overflow-x: hidden;
+  }
+  .kanban-board {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .kanban-column-ghost {
+    width: 100%;
+    min-width: unset;
+  }
 }
 </style>
