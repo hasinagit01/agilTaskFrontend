@@ -30,11 +30,11 @@
         <v-chip
           v-if="card.due_date"
           size="x-small"
-          :color="isDueSoon(card.due_date) ? 'warning' : 'default'"
+          :color="isOverdue(card.due_date) ? 'error' : isDueSoon(card.due_date) ? 'warning' : 'default'"
           variant="tonal"
           prepend-icon="mdi-calendar"
         >
-          {{ formatDate(card.due_date) }}
+          {{ formatDateShort(card.due_date) }}
         </v-chip>
         <span v-else />
 
@@ -58,6 +58,8 @@
 </template>
 
 <script setup>
+import { formatDateShort, isDueSoon, isOverdue } from '@/utils/date'
+
 const props = defineProps({
   card:     { type: Object, required: true },
   columnId: { type: Number, required: true },
@@ -68,15 +70,6 @@ function onDragStart(e) {
   e.dataTransfer.setData('cardId',   String(props.card.id))
   e.dataTransfer.setData('columnId', String(props.columnId))
   e.dataTransfer.effectAllowed = 'move'
-}
-
-function formatDate(iso) {
-  return new Date(iso).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short' })
-}
-
-function isDueSoon(iso) {
-  const diff = new Date(iso) - new Date()
-  return diff >= 0 && diff < 3 * 24 * 60 * 60 * 1000
 }
 </script>
 

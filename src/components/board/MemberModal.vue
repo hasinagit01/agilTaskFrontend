@@ -103,12 +103,14 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, watch } from 'vue'
 import { userService }   from '@/services/user.service'
 import { useMemberStore } from '@/stores/member.store'
 import { useAuthStore }   from '@/stores/auth.store'
 
 const model = defineModel({ type: Boolean, default: false })
+
+watch(model, (open) => { if (!open) clearSearch() })
 
 const props = defineProps({
   boardId: { type: Number, required: true },

@@ -57,7 +57,7 @@
                       @click.prevent
                     />
                   </template>
-                  <v-list density="compact" rounded="lg">
+                  <v-list>
                     <v-list-item
                       prepend-icon="mdi-pencil-outline"
                       title="Renommer"
@@ -136,6 +136,7 @@ import BaseButton    from '@/components/common/BaseButton.vue'
 import BaseModal     from '@/components/common/BaseModal.vue'
 import { useAuthStore }  from '@/stores/auth.store'
 import { useBoardStore } from '@/stores/board.store'
+import { formatDate } from '@/utils/date'
 
 const authStore  = useAuthStore()
 const boardStore = useBoardStore()
@@ -146,10 +147,6 @@ const deleteDialog = ref(false)
 const boardName    = ref('')
 const selectedBoard = ref(null)
 const saving       = ref(false)
-
-function formatDate(iso) {
-  return new Date(iso).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short', year: 'numeric' })
-}
 
 function openCreateDialog() {
   boardName.value = ''

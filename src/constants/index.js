@@ -31,11 +31,11 @@ export const HTTP_STATUS = {
   SERVER_ERROR: 500,
 }
 
-// ===== Rôles utilisateur =====
-export const USER_ROLES = {
-  ADMIN: 'admin',
-  USER:  'user',
-  GUEST: 'guest',
+// ===== Rôles board (correspondent aux valeurs backend) =====
+export const BOARD_ROLES = {
+  OWNER:  'owner',
+  MEMBER: 'member',
+  VIEWER: 'viewer',
 }
 
 // ===== Messages snackbar =====

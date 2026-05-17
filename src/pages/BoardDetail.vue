@@ -280,6 +280,7 @@ onUnmounted(() => {
   columnStore.reset()
   cardStore.reset()
   labelStore.reset()
+  memberStore.reset()
 })
 </script>
 

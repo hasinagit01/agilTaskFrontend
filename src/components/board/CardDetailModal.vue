@@ -141,6 +141,7 @@ watch(() => props.card, (c) => {
       description: c.description || '',
       due_date:    c.due_date    || null,
     }
+    selectedMember.value = null
   }
 }, { immediate: true })
 
@@ -151,6 +152,7 @@ function onAssign(userId) {
 }
 
 function handleSave() {
+  if (!form.value.title.trim()) return
   emit('save', { card: props.card, data: { ...form.value } })
 }
 </script>
