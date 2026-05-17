@@ -71,6 +71,8 @@
             @delete="confirmDeleteColumn"
             @open-card="openCardDetail"
             @drop-card="handleDropCard"
+            @reorder-columns="handleReorderColumns"
+            @reorder-cards="handleReorderCards"
           />
 
           <!-- Fantôme d'ajout de colonne -->
@@ -277,6 +279,24 @@ async function handleAddCard({ columnId, title }) {
 // ===== Drag & Drop carte =====
 async function handleDropCard({ cardId, fromColumnId, toColumnId }) {
   await cardStore.moveCard(boardId.value, fromColumnId, cardId, toColumnId)
+}
+
+async function handleReorderColumns({ fromColumnId, toColumnId, side }) {
+  const cols = [...columnStore.columns]
+  const fromIdx = cols.findIndex(c => c.id === fromColumnId)
+  const toIdx   = cols.findIndex(c => c.id === toColumnId)
+  if (fromIdx === -1 || toIdx === -1 || fromIdx === toIdx) return
+
+  const [moved] = cols.splice(fromIdx, 1)
+  // After removal, indices after fromIdx shift left by 1
+  const adjustedTo = toIdx > fromIdx ? toIdx - 1 : toIdx
+  const insertAt   = side === 'right' ? adjustedTo + 1 : adjustedTo
+  cols.splice(insertAt, 0, moved)
+  await columnStore.reorderColumns(boardId.value, cols.map(c => c.id))
+}
+
+async function handleReorderCards({ columnId, cardIds }) {
+  await cardStore.reorderCards(boardId.value, columnId, cardIds)
 }
 
 // ===== Détail carte =====

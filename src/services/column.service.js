@@ -13,4 +13,7 @@ export const columnService = {
   remove(boardId, columnId) {
     return api.delete(`/boards/${boardId}/columns/${columnId}`)
   },
+  reorder(boardId, columnIds) {
+    return api.patch(`/boards/${boardId}/columns/reorder`, { ordered_ids: columnIds })
+  },
 }

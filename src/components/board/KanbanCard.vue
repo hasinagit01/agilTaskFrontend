@@ -73,8 +73,8 @@ const isDragging = ref(false)
 
 function onDragStart(e) {
   isDragging.value = true
-  e.dataTransfer.setData('cardId',   String(props.card.id))
-  e.dataTransfer.setData('columnId', String(props.columnId))
+  e.dataTransfer.setData('card-drag-id',  String(props.card.id))
+  e.dataTransfer.setData('card-column-id', String(props.columnId))
   e.dataTransfer.effectAllowed = 'move'
 }
 </script>

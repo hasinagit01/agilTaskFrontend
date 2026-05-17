@@ -76,12 +76,25 @@ export const useCardStore = defineStore('card', () => {
     }
   }
 
+  async function reorderCards(boardId, columnId, cardIds) {
+    const previous = [...(cardsByColumn.value[columnId] || [])]
+    cardsByColumn.value[columnId] = cardIds
+      .map((id, i) => ({ ...(cardsByColumn.value[columnId] || []).find(c => c.id === id), position: i + 1 }))
+      .filter(Boolean)
+    try {
+      await cardService.reorder(boardId, columnId, cardIds)
+    } catch (error) {
+      cardsByColumn.value[columnId] = previous
+      useNotificationStore().error('Erreur lors du réordonnancement des cartes')
+    }
+  }
+
   function reset() {
     cardsByColumn.value = {}
   }
 
   return {
     cardsByColumn, loading,
-    fetchCards, createCard, updateCard, moveCard, removeCard, reset,
+    fetchCards, createCard, updateCard, moveCard, removeCard, reorderCards, reset,
   }
 })

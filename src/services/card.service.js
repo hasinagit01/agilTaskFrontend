@@ -18,4 +18,7 @@ export const cardService = {
   remove(boardId, columnId, cardId) {
     return api.delete(`/boards/${boardId}/columns/${columnId}/cards/${cardId}`)
   },
+  reorder(boardId, columnId, cardIds) {
+    return api.patch(`/boards/${boardId}/columns/${columnId}/cards/reorder`, { ordered_ids: cardIds })
+  },
 }
