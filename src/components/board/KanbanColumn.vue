@@ -87,9 +87,8 @@ import { ref, computed } from 'vue'
 import KanbanCard from './KanbanCard.vue'
 
 const props = defineProps({
-  column:  { type: Object, required: true },
-  cards:   { type: Array,  default: () => [] },
-  boardId: { type: Number, required: true },
+  column: { type: Object, required: true },
+  cards:  { type: Array,  default: () => [] },
 })
 const emit = defineEmits(['add-card', 'rename', 'delete', 'open-card', 'drop-card'])
 

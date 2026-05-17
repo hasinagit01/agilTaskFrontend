@@ -76,26 +76,12 @@ export const useCardStore = defineStore('card', () => {
     }
   }
 
-  async function reorderCards(boardId, columnId, orderedIds) {
-    try {
-      await cardService.reorder(boardId, columnId, orderedIds)
-      const cards = cardsByColumn.value[columnId] || []
-      orderedIds.forEach((id, index) => {
-        const card = cards.find(c => c.id === id)
-        if (card) card.position = index
-      })
-      cardsByColumn.value[columnId] = [...cards].sort((a, b) => a.position - b.position)
-    } catch (error) {
-      useNotificationStore().error(error.message || 'Erreur lors du réordonnancement')
-    }
-  }
-
   function reset() {
     cardsByColumn.value = {}
   }
 
   return {
     cardsByColumn, loading,
-    fetchCards, createCard, updateCard, moveCard, removeCard, reorderCards, reset,
+    fetchCards, createCard, updateCard, moveCard, removeCard, reset,
   }
 })

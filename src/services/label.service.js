@@ -7,9 +7,6 @@ export const labelService = {
   create(boardId, data) {
     return api.post(`/boards/${boardId}/labels/`, data)
   },
-  update(boardId, labelId, data) {
-    return api.put(`/boards/${boardId}/labels/${labelId}`, data)
-  },
   remove(boardId, labelId) {
     return api.delete(`/boards/${boardId}/labels/${labelId}`)
   },

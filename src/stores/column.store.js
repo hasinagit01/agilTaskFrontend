@@ -53,25 +53,12 @@ export const useColumnStore = defineStore('column', () => {
     }
   }
 
-  async function reorderColumns(boardId, orderedIds) {
-    try {
-      await columnService.reorder(boardId, orderedIds)
-      orderedIds.forEach((id, index) => {
-        const col = columns.value.find(c => c.id === id)
-        if (col) col.position = index
-      })
-      columns.value.sort((a, b) => a.position - b.position)
-    } catch (error) {
-      useNotificationStore().error(error.message || 'Erreur lors du réordonnancement')
-    }
-  }
-
   function reset() {
     columns.value = []
   }
 
   return {
     columns, loading,
-    fetchColumns, createColumn, updateColumn, removeColumn, reorderColumns, reset,
+    fetchColumns, createColumn, updateColumn, removeColumn, reset,
   }
 })

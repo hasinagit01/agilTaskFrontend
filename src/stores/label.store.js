@@ -30,18 +30,6 @@ export const useLabelStore = defineStore('label', () => {
     }
   }
 
-  async function updateLabel(boardId, labelId, data) {
-    try {
-      const result = await labelService.update(boardId, labelId, data)
-      const idx = labels.value.findIndex(l => l.id === labelId)
-      if (idx !== -1) labels.value[idx] = result.data
-      return result.data
-    } catch (error) {
-      useNotificationStore().error(error.message || 'Erreur lors de la mise à jour')
-      return null
-    }
-  }
-
   async function removeLabel(boardId, labelId) {
     try {
       await labelService.remove(boardId, labelId)
@@ -59,6 +47,6 @@ export const useLabelStore = defineStore('label', () => {
 
   return {
     labels, loading,
-    fetchLabels, createLabel, updateLabel, removeLabel, reset,
+    fetchLabels, createLabel, removeLabel, reset,
   }
 })

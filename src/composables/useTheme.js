@@ -8,8 +8,7 @@ export function useTheme() {
   const theme       = inject('theme')
   const toggleTheme = inject('toggleTheme')
 
-  const isDark  = computed(() => theme.value === 'dark')
-  const isLight = computed(() => theme.value === 'light')
+  const isDark = computed(() => theme.value === 'dark')
 
   function setTheme(value) {
     if (theme && (value === 'light' || value === 'dark')) {
@@ -18,13 +17,5 @@ export function useTheme() {
     }
   }
 
-  function initTheme() {
-    const saved = localStorage.getItem(STORAGE_KEYS.THEME)
-    if (saved) setTheme(saved)
-    else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
-      setTheme('dark')
-    }
-  }
-
-  return { theme, isDark, isLight, toggleTheme, setTheme, initTheme }
+  return { theme, isDark, toggleTheme, setTheme }
 }
