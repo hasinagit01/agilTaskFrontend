@@ -1,7 +1,7 @@
 <template>
   <DefaultLayout>
     <div>
-      <h1 class="text-h4 font-weight-bold mb-2">À propos</h1>
+      <h1 class="text-h4 font-weight-bold mb-6 page-title">À propos</h1>
       <p class="text-medium-emphasis mb-6">Découvrez Agil Task et WalkingDev.</p>
 
       <v-row>

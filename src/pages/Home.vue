@@ -4,7 +4,7 @@
       <!-- En-tête -->
       <div class="d-flex align-center justify-space-between mb-6 flex-wrap gap-3">
         <div>
-          <h1 class="text-h4 font-weight-bold">Mes boards</h1>
+          <h1 class="text-h4 font-weight-bold page-title">Mes boards</h1>
           <p class="text-medium-emphasis mt-1">
             Bienvenue, {{ authStore.currentUser?.email }}
           </p>

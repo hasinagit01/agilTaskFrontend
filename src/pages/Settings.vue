@@ -1,7 +1,7 @@
 <template>
   <DefaultLayout>
     <div>
-      <h1 class="text-h4 font-weight-bold mb-6">Paramètres</h1>
+      <h1 class="text-h4 font-weight-bold mb-6 page-title">Paramètres</h1>
 
       <v-row>
         <v-col cols="12" md="6">

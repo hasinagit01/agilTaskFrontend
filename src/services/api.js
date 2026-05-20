@@ -40,9 +40,17 @@ api.interceptors.response.use(
     const status = error.response.status
 
     if (status === HTTP_STATUS.UNAUTHORIZED) {
+      const authStore = useAuthStore()
+      // Pas de token = erreur de credentials (login/register), rejeter normalement
+      if (!authStore.token) {
+        return Promise.reject({
+          status,
+          message: error.response?.data?.error || 'Email ou mot de passe incorrect',
+          data: error.response?.data || null,
+        })
+      }
       if (!_redirectingToLogin) {
         _redirectingToLogin = true
-        const authStore = useAuthStore()
         authStore.clearAuth()
         await router.replace({ name: 'Login' })
         _redirectingToLogin = false

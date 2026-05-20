@@ -11,7 +11,7 @@
             :to="{ name: 'Home' }"
           />
           <div>
-            <h1 class="text-h5 font-weight-bold">{{ boardStore.currentBoard?.name }}</h1>
+            <h1 class="text-h5 font-weight-bold page-title">{{ boardStore.currentBoard?.name }}</h1>
           </div>
         </div>
         <div class="header-actions">
@@ -34,6 +34,24 @@
               @click="labelModalOpen = true"
             >
               <span class="d-none d-sm-inline">Labels</span>
+            </v-btn>
+            <v-btn
+              variant="tonal"
+              size="small"
+              :icon="mobile ? 'mdi-archive-outline' : undefined"
+              :prepend-icon="mobile ? undefined : 'mdi-archive-outline'"
+              @click="archiveOpen = true"
+            >
+              <span class="d-none d-sm-inline">Archives</span>
+            </v-btn>
+            <v-btn
+              variant="tonal"
+              size="small"
+              :icon="mobile ? 'mdi-history' : undefined"
+              :prepend-icon="mobile ? undefined : 'mdi-history'"
+              @click="activityOpen = true"
+            >
+              <span class="d-none d-sm-inline">Activité</span>
             </v-btn>
           </div>
           <v-divider vertical class="header-actions__divider" />
@@ -115,6 +133,8 @@
             @drop-card="handleDropCard"
             @reorder-columns="handleReorderColumns"
             @reorder-cards="handleReorderCards"
+            @archive-card="handleArchiveCard"
+            @archive-column="handleArchiveColumn"
           />
 
           <!-- Fantôme d'ajout de colonne -->
@@ -192,6 +212,12 @@
       :board-id="boardId"
     />
 
+    <!-- Panneau archives -->
+    <ArchivePanel v-model="archiveOpen" :board-id="boardId" />
+
+    <!-- Tiroir activité -->
+    <ActivityDrawer v-model="activityOpen" :board-id="boardId" />
+
     <!-- Confirmation quitter sans sauvegarder -->
     <BaseModal
       v-model="leaveConfirmOpen"
@@ -217,12 +243,16 @@ import KanbanColumn    from '@/components/board/KanbanColumn.vue'
 import CardDetailModal from '@/components/board/CardDetailModal.vue'
 import MemberModal     from '@/components/board/MemberModal.vue'
 import LabelModal      from '@/components/board/LabelModal.vue'
+import ArchivePanel    from '@/components/board/ArchivePanel.vue'
+import ActivityDrawer  from '@/components/board/ActivityDrawer.vue'
 import { useBoardStore  } from '@/stores/board.store'
 import { useColumnStore } from '@/stores/column.store'
 import { useCardStore   } from '@/stores/card.store'
 import { useLabelStore  } from '@/stores/label.store'
 import { useMemberStore } from '@/stores/member.store'
 import { useAuthStore   } from '@/stores/auth.store'
+import { useArchiveStore }   from '@/stores/archive.store'
+import { useActivityStore }  from '@/stores/activity.store'
 import { labelService   } from '@/services/label.service'
 import { assigneeService } from '@/services/assignee.service'
 
@@ -263,6 +293,11 @@ function filteredCards(columnId) {
   }
   return cards
 }
+
+const archiveStore  = useArchiveStore()
+const activityStore = useActivityStore()
+const archiveOpen   = ref(false)
+const activityOpen  = ref(false)
 
 const loading         = ref(false)
 const memberModalOpen = ref(false)
@@ -424,6 +459,15 @@ async function handleAttachLabel({ card, labelId }) {
   refreshSelectedCard(card.column_id, card.id)
 }
 
+// ===== Archivage =====
+async function handleArchiveCard({ boardId: bid, columnId, cardId }) {
+  await archiveStore.archiveCard(bid, columnId, cardId)
+}
+
+async function handleArchiveColumn({ boardId: bid, columnId }) {
+  await archiveStore.archiveColumn(bid, columnId)
+}
+
 // ===== Chargement initial =====
 async function loadBoard() {
   loading.value = true
@@ -436,6 +480,7 @@ async function loadBoard() {
   await Promise.all(
     columnStore.columns.map(col => cardStore.fetchCards(boardId.value, col.id))
   )
+  archiveStore.fetchArchives(boardId.value)
   loading.value = false
 }
 
@@ -446,6 +491,8 @@ onUnmounted(() => {
   cardStore.reset()
   labelStore.reset()
   memberStore.reset()
+  archiveStore.reset()
+  activityStore.reset()
 })
 </script>
 

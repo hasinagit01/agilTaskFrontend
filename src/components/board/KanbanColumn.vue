@@ -45,6 +45,8 @@
         </template>
         <v-list>
           <v-list-item prepend-icon="mdi-pencil-outline" title="Renommer" @click="startEditName" />
+          <v-list-item prepend-icon="mdi-archive-arrow-down-outline" title="Archiver" @click="$emit('archive-column', { boardId: props.column.board_id, columnId: props.column.id })" />
+          <v-divider />
           <v-list-item prepend-icon="mdi-delete-outline" title="Supprimer" class="text-error" @click="$emit('delete', column)" />
         </v-list>
       </v-menu>
@@ -59,6 +61,7 @@
             :card="card"
             :column-id="column.id"
             @open="$emit('open-card', $event)"
+            @archive="(card) => $emit('archive-card', { boardId: props.column.board_id, columnId: props.column.id, cardId: card.id })"
           />
         </div>
       </template>
@@ -107,7 +110,7 @@ const props = defineProps({
   column: { type: Object, required: true },
   cards:  { type: Array,  default: () => [] },
 })
-const emit = defineEmits(['add-card', 'rename', 'delete', 'open-card', 'drop-card', 'reorder-columns', 'reorder-cards'])
+const emit = defineEmits(['add-card', 'rename', 'delete', 'open-card', 'drop-card', 'reorder-columns', 'reorder-cards', 'archive-card', 'archive-column'])
 
 const columnEl       = ref(null)
 const cardsContainer = ref(null)

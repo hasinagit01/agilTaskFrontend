@@ -1,7 +1,7 @@
 <template>
   <DefaultLayout>
     <div>
-      <h1 class="text-h4 font-weight-bold mb-6">Mon profil</h1>
+      <h1 class="text-h4 font-weight-bold mb-6 page-title">Mon profil</h1>
 
       <v-row>
         <!-- Carte profil -->

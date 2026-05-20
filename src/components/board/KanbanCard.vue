@@ -55,6 +55,29 @@
           </v-avatar>
         </div>
       </div>
+
+      <!-- Menu actions -->
+      <div class="card-actions">
+        <v-menu>
+          <template #activator="{ props: menuProps }">
+            <v-btn
+              icon="mdi-dots-horizontal"
+              variant="text"
+              size="x-small"
+              density="comfortable"
+              v-bind="menuProps"
+              @click.stop
+            />
+          </template>
+          <v-list density="compact">
+            <v-list-item
+              prepend-icon="mdi-archive-arrow-down-outline"
+              title="Archiver"
+              @click.stop="$emit('archive', card)"
+            />
+          </v-list>
+        </v-menu>
+      </div>
     </v-card-text>
   </v-card>
 </template>
@@ -67,7 +90,7 @@ const props = defineProps({
   card:     { type: Object, required: true },
   columnId: { type: Number, required: true },
 })
-defineEmits(['open'])
+defineEmits(['open', 'archive'])
 
 const isDragging = ref(false)
 
@@ -105,5 +128,10 @@ function onDragStart(e) {
 }
 .assignee-group .v-avatar:first-child {
   margin-left: 0;
+}
+.card-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 4px;
 }
 </style>
