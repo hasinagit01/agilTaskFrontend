@@ -32,7 +32,12 @@ api.interceptors.request.use(
 api.interceptors.response.use(
   (response) => response.data,
   async (error) => {
-    const status = error.response?.status
+    if (!error.response) {
+      router.replace({ name: 'Error', query: { code: 'network' } })
+      return new Promise(() => {})
+    }
+
+    const status = error.response.status
 
     if (status === HTTP_STATUS.UNAUTHORIZED) {
       if (!_redirectingToLogin) {
@@ -42,26 +47,22 @@ api.interceptors.response.use(
         await router.replace({ name: 'Login' })
         _redirectingToLogin = false
       }
-      // Retourne une promesse en attente pour stopper la chaîne d'appels
-      // (le composant sera détruit par la navigation, pas besoin de rejeter)
       return new Promise(() => {})
     }
 
     if (status === HTTP_STATUS.FORBIDDEN) {
-      router.push({ name: 'Error', query: { code: 403 } })
+      router.replace({ name: 'Error', query: { code: 403 } })
+      return new Promise(() => {})
     }
 
     if (status === HTTP_STATUS.NOT_FOUND) {
-      router.push({ name: 'NotFound' })
+      router.replace({ name: 'NotFound' })
+      return new Promise(() => {})
     }
 
-    if (status === HTTP_STATUS.SERVER_ERROR || status >= 500) {
-      router.push({ name: 'Error', query: { code: 500 } })
-    }
-
-    if (!error.response) {
-      // Pas de réponse du serveur : timeout ou réseau coupé
-      router.push({ name: 'Error', query: { code: 'network' } })
+    if (status >= 500) {
+      router.replace({ name: 'Error', query: { code: status } })
+      return new Promise(() => {})
     }
 
     return Promise.reject({

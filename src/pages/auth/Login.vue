@@ -17,6 +17,7 @@
             v-bind="emailProps"
             label="Email"
             type="email"
+            autocomplete="email"
             prepend-icon="mdi-email-outline"
             class="mb-3"
           />
@@ -25,19 +26,15 @@
             v-bind="passwordProps"
             label="Mot de passe"
             type="password"
+            autocomplete="current-password"
             prepend-icon="mdi-lock-outline"
-            class="mb-1"
+            class="mb-6"
           />
-
-          <div class="d-flex justify-end mb-6">
-            <v-btn variant="text" size="small" color="primary" class="text-caption">
-              Mot de passe oublié ?
-            </v-btn>
-          </div>
 
           <BaseButton
             type="submit"
             :loading="loading"
+            :disabled="loading"
             block
             size="large"
             prepend-icon="mdi-login"

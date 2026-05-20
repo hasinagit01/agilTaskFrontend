@@ -58,20 +58,6 @@ const routes = [
     meta: { requiresAuth: true },
   },
 
-  // ===== Routes admin =====
-  {
-    path: '/admin/users',
-    name: 'AdminUsers',
-    component: () => import('@/pages/NotFound.vue'),
-    meta: { requiresAuth: true, requiresAdmin: true },
-  },
-  {
-    path: '/admin/dashboard',
-    name: 'AdminDashboard',
-    component: () => import('@/pages/NotFound.vue'),
-    meta: { requiresAuth: true, requiresAdmin: true },
-  },
-
   // ===== Pages d'erreur =====
   {
     path: '/error',
@@ -101,11 +87,6 @@ router.beforeEach((to, from, next) => {
 
   if (to.meta.requiresAuth && !authStore.isLoggedIn) {
     next({ name: 'Login', query: { redirect: to.fullPath } })
-    return
-  }
-
-  if (to.meta.requiresAdmin && !authStore.isAdmin) {
-    next({ name: 'Home' })
     return
   }
 

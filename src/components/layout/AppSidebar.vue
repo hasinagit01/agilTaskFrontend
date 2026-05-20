@@ -35,25 +35,6 @@
       />
     </v-list>
 
-    <!-- Section Admin (si admin) -->
-    <template v-if="isAdmin">
-      <v-divider class="my-2" />
-      <v-list-subheader v-if="!rail">Administration</v-list-subheader>
-      <v-list density="compact" nav>
-        <v-list-item
-          v-for="item in adminItems"
-          :key="item.title"
-          :prepend-icon="item.icon"
-          :title="item.title"
-          :to="item.to"
-          :value="item.title"
-          rounded="lg"
-          color="primary"
-          class="mb-1"
-        />
-      </v-list>
-    </template>
-
     <!-- Profil en bas -->
     <template #append>
       <v-divider />
@@ -80,14 +61,13 @@
 import { ref, computed } from 'vue'
 import { useDisplay } from 'vuetify'
 import { useAuthStore } from '@/stores/auth.store'
-import { APP_NAME }     from '@/constants'
+import { APP_NAME } from '@/constants'
 
 const model = defineModel({ type: Boolean, default: true })
 
 const { mobile }  = useDisplay()
 const authStore   = useAuthStore()
 const currentUser = computed(() => authStore.currentUser)
-const isAdmin     = computed(() => authStore.isAdmin)
 const rail        = ref(false)
 
 const navItems = [
@@ -95,10 +75,5 @@ const navItems = [
   { title: 'Profil',      icon: 'mdi-account-outline',     to: { name: 'Profile' }  },
   { title: 'Paramètres',  icon: 'mdi-cog-outline',         to: { name: 'Settings' } },
   { title: 'À propos',    icon: 'mdi-information-outline', to: { name: 'About' }    },
-]
-
-const adminItems = [
-  { title: 'Utilisateurs', icon: 'mdi-account-group-outline', to: '/admin/users'     },
-  { title: 'Tableau bord', icon: 'mdi-view-dashboard-outline',to: '/admin/dashboard' },
 ]
 </script>

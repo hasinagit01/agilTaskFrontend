@@ -17,6 +17,7 @@
             v-bind="emailProps"
             label="Email"
             type="email"
+            autocomplete="email"
             prepend-icon="mdi-email-outline"
             class="mb-3"
           />
@@ -25,6 +26,7 @@
             v-bind="passwordProps"
             label="Mot de passe"
             type="password"
+            autocomplete="new-password"
             prepend-icon="mdi-lock-outline"
             class="mb-3"
           />
@@ -33,30 +35,15 @@
             v-bind="confirmPasswordProps"
             label="Confirmer le mot de passe"
             type="password"
+            autocomplete="new-password"
             prepend-icon="mdi-lock-check-outline"
-            class="mb-2"
-          />
-
-          <!-- CGU -->
-          <v-checkbox
-            v-model="acceptTerms"
-            color="primary"
-            density="compact"
-            hide-details
             class="mb-6"
-          >
-            <template #label>
-              <span class="text-body-2">
-                J'accepte les
-                <a href="#" class="text-primary">conditions d'utilisation</a>
-              </span>
-            </template>
-          </v-checkbox>
+          />
 
           <BaseButton
             type="submit"
             :loading="loading"
-            :disabled="!acceptTerms"
+            :disabled="loading"
             block
             size="large"
             prepend-icon="mdi-account-plus"
@@ -77,7 +64,6 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
 import { useForm } from 'vee-validate'
 import { toTypedSchema } from '@vee-validate/zod'
 import AuthLayout from '@/layouts/AuthLayout.vue'
@@ -87,7 +73,6 @@ import { useAuth } from '@/composables/useAuth'
 import { registerSchema } from '@/schemas/auth.schema'
 
 const { register, loading } = useAuth()
-const acceptTerms = ref(false)
 
 const { defineField, handleSubmit } = useForm({
   validationSchema: toTypedSchema(registerSchema),
@@ -100,7 +85,6 @@ const [password,        passwordProps]        = defineField('password',        v
 const [confirmPassword, confirmPasswordProps] = defineField('confirmPassword', vuetifyConfig)
 
 const onSubmit = handleSubmit(async (values) => {
-  if (!acceptTerms.value) return
   await register({ email: values.email, password: values.password })
 })
 </script>

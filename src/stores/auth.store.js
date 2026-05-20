@@ -12,7 +12,6 @@ export const useAuthStore = defineStore('auth', () => {
 
   // ===== Getters =====
   const isLoggedIn   = computed(() => !!token.value && !!user.value)
-  const isAdmin      = computed(() => false)
   const currentUser  = computed(() => user.value)
   const userInitials = computed(() => {
     if (!user.value?.email) return '?'
@@ -64,22 +63,14 @@ export const useAuthStore = defineStore('auth', () => {
 
   async function logout() {
     const notifStore = useNotificationStore()
-    try {
-      await authService.logout()
-    } finally {
-      clearAuth()
-      notifStore.info(MESSAGES.LOGOUT_SUCCESS)
-    }
-  }
-
-  async function fetchCurrentUser() {
-    // L'utilisateur est reconstruit depuis le JWT stocké — pas d'endpoint /users/me
+    clearAuth()
+    notifStore.info(MESSAGES.LOGOUT_SUCCESS)
   }
 
   return {
     user, token, loading,
-    isLoggedIn, isAdmin, currentUser, userInitials,
-    setAuth, clearAuth, login, register, logout, fetchCurrentUser,
+    isLoggedIn, currentUser, userInitials,
+    setAuth, clearAuth, login, register, logout,
   }
 }, {
   persist: {

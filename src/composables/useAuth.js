@@ -13,7 +13,6 @@ export function useAuth() {
   const route     = useRoute()
 
   const isLoggedIn  = computed(() => authStore.isLoggedIn)
-  const isAdmin     = computed(() => authStore.isAdmin)
   const currentUser = computed(() => authStore.currentUser)
   const loading     = computed(() => authStore.loading)
 
@@ -48,7 +47,7 @@ export function useAuth() {
   }
 
   return {
-    isLoggedIn, isAdmin, currentUser, loading,
+    isLoggedIn, currentUser, loading,
     login, register, logout, requireAuth,
   }
 }
