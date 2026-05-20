@@ -2,7 +2,7 @@
   <DefaultLayout>
     <div class="board-detail">
       <!-- En-tête -->
-      <div class="d-flex align-center justify-space-between mb-5">
+      <div class="d-flex align-center justify-space-between mb-4 flex-wrap gap-3">
         <div class="d-flex align-center gap-3">
           <v-btn
             icon="mdi-arrow-left"
@@ -15,7 +15,6 @@
           </div>
         </div>
         <div class="header-actions">
-          <!-- Paramètres du board -->
           <div class="header-actions__group">
             <v-btn
               v-if="isOwner"
@@ -37,10 +36,7 @@
               <span class="d-none d-sm-inline">Labels</span>
             </v-btn>
           </div>
-
           <v-divider vertical class="header-actions__divider" />
-
-          <!-- Action principale -->
           <v-btn
             color="primary"
             variant="flat"
@@ -54,6 +50,52 @@
         </div>
       </div>
 
+      <!-- Barre de filtres -->
+      <div v-if="!loading" class="d-flex align-center gap-4 mb-4 flex-wrap">
+        <v-select
+          v-model="filterLabelId"
+          :items="labelStore.labels"
+          item-title="name"
+          item-value="id"
+          placeholder="Filtrer par label"
+          hide-details
+          density="compact"
+          clearable
+          style="max-width: 200px; margin-right: 16px"
+        >
+          <template #item="{ item, props: p }">
+            <v-list-item v-bind="p">
+              <template #prepend>
+                <v-chip :color="item.raw.color" size="x-small" variant="flat" label class="mr-2">&nbsp;</v-chip>
+              </template>
+            </v-list-item>
+          </template>
+        </v-select>
+
+        <v-select
+          v-model="filterAssigneeId"
+          :items="memberStore.members"
+          item-title="email"
+          item-value="user_id"
+          placeholder="Filtrer par assigné"
+          hide-details
+          density="compact"
+          clearable
+          style="max-width: 200px"
+        />
+
+        <v-chip
+          v-if="isFiltered"
+          size="small"
+          variant="tonal"
+          color="primary"
+          closable
+          @click:close="clearFilters"
+        >
+          Filtres actifs
+        </v-chip>
+      </div>
+
       <!-- Loader -->
       <SkeletonKanban v-if="loading" />
 
@@ -64,7 +106,7 @@
             v-for="column in columnStore.columns"
             :key="column.id"
             :column="column"
-            :cards="cardStore.cardsByColumn[column.id] || []"
+            :cards="filteredCards(column.id)"
             :board-id="boardId"
             @add-card="handleAddCard"
             @rename="handleRenameColumn"
@@ -201,6 +243,26 @@ const isOwner = computed(() =>
     m => m.user_id === authStore.currentUser?.id && m.role === 'owner'
   )
 )
+
+const filterLabelId    = ref(null)
+const filterAssigneeId = ref(null)
+const isFiltered = computed(() => filterLabelId.value || filterAssigneeId.value)
+
+function clearFilters() {
+  filterLabelId.value    = null
+  filterAssigneeId.value = null
+}
+
+function filteredCards(columnId) {
+  let cards = cardStore.cardsByColumn[columnId] || []
+  if (filterLabelId.value) {
+    cards = cards.filter(c => c.labels?.some(l => l.id === filterLabelId.value))
+  }
+  if (filterAssigneeId.value) {
+    cards = cards.filter(c => c.assignees?.some(a => a.user_id === filterAssigneeId.value))
+  }
+  return cards
+}
 
 const loading         = ref(false)
 const memberModalOpen = ref(false)

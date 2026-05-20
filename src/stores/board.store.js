@@ -1,23 +1,41 @@
 import { defineStore } from 'pinia'
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import { boardService } from '@/services/board.service'
 import { useNotificationStore } from './notification.store'
 
-export const useBoardStore = defineStore('board', () => {
-  const boards = ref([])
-  const currentBoard = ref(null)
-  const loading = ref(false)
+const PAGE_SIZE = 10
 
-  async function fetchBoards() {
+export const useBoardStore = defineStore('board', () => {
+  const boards       = ref([])
+  const currentBoard = ref(null)
+  const loading      = ref(false)
+  const total        = ref(0)
+  const page         = ref(1)
+
+  const hasMore = computed(() => boards.value.length < total.value)
+
+  async function fetchBoards(reset = true) {
+    if (reset) {
+      boards.value = []
+      page.value   = 1
+    }
     loading.value = true
     try {
-      const result = await boardService.getAll()
-      boards.value = result.data
+      const result  = await boardService.getAll({ page: page.value, limit: PAGE_SIZE })
+      const newData = result.data ?? []
+      boards.value  = reset ? newData : [...boards.value, ...newData]
+      total.value   = result.total ?? newData.length
     } catch (error) {
       useNotificationStore().error(error.message || 'Erreur lors du chargement des boards')
     } finally {
       loading.value = false
     }
+  }
+
+  async function loadMore() {
+    if (!hasMore.value || loading.value) return
+    page.value++
+    await fetchBoards(false)
   }
 
   async function fetchBoard(boardId) {
@@ -37,7 +55,8 @@ export const useBoardStore = defineStore('board', () => {
   async function createBoard(name) {
     try {
       const result = await boardService.create({ name })
-      boards.value.push(result.data)
+      boards.value.unshift(result.data)
+      total.value++
       useNotificationStore().success('Board créé avec succès')
       return result.data
     } catch (error) {
@@ -65,6 +84,7 @@ export const useBoardStore = defineStore('board', () => {
       await boardService.remove(boardId)
       boards.value = boards.value.filter(b => b.id !== boardId)
       if (currentBoard.value?.id === boardId) currentBoard.value = null
+      total.value = Math.max(0, total.value - 1)
       useNotificationStore().success('Board supprimé')
       return true
     } catch (error) {
@@ -74,7 +94,7 @@ export const useBoardStore = defineStore('board', () => {
   }
 
   return {
-    boards, currentBoard, loading,
-    fetchBoards, fetchBoard, createBoard, updateBoard, removeBoard,
+    boards, currentBoard, loading, total, hasMore,
+    fetchBoards, loadMore, fetchBoard, createBoard, updateBoard, removeBoard,
   }
 })

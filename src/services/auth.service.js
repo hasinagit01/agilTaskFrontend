@@ -1,25 +1,23 @@
 import api from './api.js'
 
-function decodeJWT(token) {
-  try {
-    const payload = token.split('.')[1]
-    return JSON.parse(atob(payload))
-  } catch {
-    return null
-  }
-}
-
 export const authService = {
   async login({ email, password }) {
     const result = await api.post('/auth/login', { email, password })
     const access_token = result.data.access_token
-    const payload = decodeJWT(access_token)
-    const user = { id: parseInt(payload.sub), email: payload.email }
+    const profile = await api.get('/users/me', {
+      headers: { Authorization: `Bearer ${access_token}` },
+    })
+    const user = profile.data
     return { user, token: access_token }
   },
 
-  async register({ email, password }) {
-    await api.post('/auth/register', { email, password })
+  async register({ email, password, firstname, name }) {
+    await api.post('/auth/register', { email, password, firstname, name })
     return authService.login({ email, password })
+  },
+
+  async refresh() {
+    const result = await api.post('/auth/refresh')
+    return result.data.access_token
   },
 }

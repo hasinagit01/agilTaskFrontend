@@ -2,25 +2,36 @@
   <DefaultLayout>
     <div>
       <!-- En-tête -->
-      <div class="d-flex align-center justify-space-between mb-6">
+      <div class="d-flex align-center justify-space-between mb-6 flex-wrap gap-3">
         <div>
           <h1 class="text-h4 font-weight-bold">Mes boards</h1>
           <p class="text-medium-emphasis mt-1">
             Bienvenue, {{ authStore.currentUser?.email }}
           </p>
         </div>
-        <BaseButton prepend-icon="mdi-plus" @click="openCreateDialog">
-          Nouveau board
-        </BaseButton>
+        <div class="d-flex align-center gap-3 flex-wrap">
+          <v-text-field
+            v-model="search"
+            placeholder="Rechercher un board..."
+            prepend-inner-icon="mdi-magnify"
+            clearable
+            hide-details
+            density="compact"
+            style="min-width: 220px; margin-right: 16px"
+          />
+          <BaseButton prepend-icon="mdi-plus" @click="openCreateDialog">
+            Nouveau board
+          </BaseButton>
+        </div>
       </div>
 
-      <!-- Loader -->
-      <SkeletonBoardGrid v-if="boardStore.loading" :count="4" />
+      <!-- Loader initial (aucun board chargé) -->
+      <SkeletonBoardGrid v-if="boardStore.loading && !boardStore.boards.length" :count="4" />
 
       <!-- Grille de boards -->
-      <v-row v-else-if="boardStore.boards.length">
+      <v-row v-if="boardStore.boards.length">
         <v-col
-          v-for="board in boardStore.boards"
+          v-for="board in filteredBoards"
           :key="board.id"
           cols="12"
           sm="6"
@@ -75,8 +86,22 @@
         </v-col>
       </v-row>
 
+      <!-- Charger plus -->
+      <div v-if="boardStore.boards.length && boardStore.hasMore" class="text-center mt-6">
+        <v-btn
+          variant="tonal"
+          :loading="boardStore.loading"
+          @click="boardStore.loadMore()"
+        >
+          Charger plus
+        </v-btn>
+        <p class="text-caption text-medium-emphasis mt-2">
+          {{ boardStore.boards.length }} / {{ boardStore.total }} boards
+        </p>
+      </div>
+
       <!-- État vide -->
-      <div v-else class="text-center py-16">
+      <div v-else-if="!boardStore.loading && !boardStore.boards.length" class="text-center py-16">
         <v-icon icon="mdi-view-kanban-outline" size="72" color="medium-emphasis" class="mb-4" />
         <h3 class="text-h6 text-medium-emphasis mb-2">Aucun board pour l'instant</h3>
         <p class="text-body-2 text-medium-emphasis mb-6">
@@ -128,7 +153,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import DefaultLayout    from '@/layouts/DefaultLayout.vue'
 import BaseButton       from '@/components/common/BaseButton.vue'
 import BaseModal        from '@/components/common/BaseModal.vue'
@@ -139,6 +164,13 @@ import { formatDate } from '@/utils/date'
 
 const authStore  = useAuthStore()
 const boardStore = useBoardStore()
+
+const search = ref('')
+const filteredBoards = computed(() => {
+  if (!search.value?.trim()) return boardStore.boards
+  const q = search.value.toLowerCase()
+  return boardStore.boards.filter(b => b.name.toLowerCase().includes(q))
+})
 
 const createDialog = ref(false)
 const renameDialog = ref(false)
