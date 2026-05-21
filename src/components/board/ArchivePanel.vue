@@ -3,7 +3,7 @@
     <v-card rounded="xl">
       <v-card-title class="d-flex align-center justify-space-between pa-5">
         <span class="text-h6 font-weight-semibold">
-          <v-icon icon="mdi-archive-outline" class="mr-2" />
+          <v-icon icon="mdi-archive-outline" color="primary" class="mr-2" />
           Archives
         </span>
         <v-btn icon="mdi-close" variant="text" density="compact" @click="model = false" />
@@ -22,7 +22,7 @@
         </v-tab>
       </v-tabs>
 
-      <v-card-text class="pa-0" style="min-height: 300px">
+      <v-card-text class="pa-0 archive-content">
         <v-tabs-window v-model="tab">
 
           <!-- Cartes archivées -->
@@ -52,6 +52,7 @@
                       size="small"
                       variant="tonal"
                       color="primary"
+                      prepend-icon="mdi-restore"
                       :loading="restoringCardId === card.id"
                       @click="handleRestoreCard(card)"
                     >
@@ -89,6 +90,7 @@
                     size="small"
                     variant="tonal"
                     color="primary"
+                    prepend-icon="mdi-restore"
                     :loading="restoringColumnId === col.id"
                     @click="handleRestoreColumn(col)"
                   >
@@ -133,3 +135,9 @@ async function handleRestoreColumn(col) {
   restoringColumnId.value = null
 }
 </script>
+
+<style scoped>
+.archive-content {
+  min-height: 300px;
+}
+</style>

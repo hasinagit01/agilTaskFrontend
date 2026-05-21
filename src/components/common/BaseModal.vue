@@ -36,6 +36,7 @@
             <v-spacer />
             <v-btn
               variant="text"
+              :prepend-icon="cancelIcon"
               :disabled="loading"
               @click="model = false"
             >
@@ -44,6 +45,7 @@
             <v-btn
               :color="confirmColor"
               variant="flat"
+              :prepend-icon="confirmIcon"
               :loading="loading"
               @click="$emit('confirm')"
             >
@@ -60,14 +62,16 @@
 const model = defineModel({ type: Boolean, default: false })
 
 defineProps({
-  title:        { type: String,  default: ''         },
-  maxWidth:     { type: String,  default: '500'       },
-  persistent:   { type: Boolean, default: false       },
-  fullscreen:   { type: Boolean, default: false       },
-  confirmText:  { type: String,  default: 'Confirmer' },
-  cancelText:   { type: String,  default: 'Annuler'   },
-  confirmColor: { type: String,  default: 'primary'   },
-  loading:      { type: Boolean, default: false       },
+  title:        { type: String,  default: ''          },
+  maxWidth:     { type: String,  default: '500'        },
+  persistent:   { type: Boolean, default: false        },
+  fullscreen:   { type: Boolean, default: false        },
+  confirmText:  { type: String,  default: 'Confirmer'  },
+  confirmIcon:  { type: String,  default: 'mdi-check'  },
+  cancelText:   { type: String,  default: 'Annuler'    },
+  cancelIcon:   { type: String,  default: 'mdi-close'  },
+  confirmColor: { type: String,  default: 'primary'    },
+  loading:      { type: Boolean, default: false        },
 })
 
 defineEmits(['confirm'])

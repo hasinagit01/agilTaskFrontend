@@ -42,16 +42,14 @@
 
         <!-- Assignees -->
         <div v-if="card.assignees?.length" class="assignee-group">
-          <v-avatar
+          <UserAvatar
             v-for="a in card.assignees.slice(0, 3)"
             :key="a.user_id"
-            color="primary"
-            size="22"
-          >
-            <span style="font-size:10px">{{ a.email[0].toUpperCase() }}</span>
-          </v-avatar>
+            :user="a"
+            :size="22"
+          />
           <v-avatar v-if="card.assignees.length > 3" color="secondary" size="22">
-            <span style="font-size:10px">+{{ card.assignees.length - 3 }}</span>
+            <span class="avatar-initial">+{{ card.assignees.length - 3 }}</span>
           </v-avatar>
         </div>
       </div>
@@ -73,6 +71,7 @@
             <v-list-item
               prepend-icon="mdi-archive-arrow-down-outline"
               title="Archiver"
+              base-color="primary"
               @click.stop="$emit('archive', card)"
             />
           </v-list>
@@ -85,6 +84,7 @@
 <script setup>
 import { ref } from 'vue'
 import { formatDateShort, isDueSoon, isOverdue } from '@/utils/date'
+import UserAvatar from '@/components/common/UserAvatar.vue'
 
 const props = defineProps({
   card:     { type: Object, required: true },
@@ -119,6 +119,10 @@ function onDragStart(e) {
   transform: rotate(1.5deg) scale(0.98);
   box-shadow: none !important;
 }
+.avatar-initial {
+  font-size: 10px;
+}
+
 .assignee-group {
   display: flex;
 }

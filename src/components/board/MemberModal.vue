@@ -31,15 +31,14 @@
               :title="u.email"
             >
               <template #prepend>
-                <v-avatar color="primary" size="32">
-                  <span class="text-caption text-white">{{ u.email?.[0]?.toUpperCase() ?? '?' }}</span>
-                </v-avatar>
+                <UserAvatar :user="u" :size="32" />
               </template>
               <template #append>
                 <v-btn
                   size="small"
                   color="primary"
                   variant="tonal"
+                  :prepend-icon="isAlreadyMember(u.id) ? 'mdi-check' : 'mdi-account-plus-outline'"
                   :loading="addingId === u.id"
                   :disabled="isAlreadyMember(u.id)"
                   @click="addMember(u)"
@@ -75,9 +74,7 @@
             class="mb-1"
           >
             <template #prepend>
-              <v-avatar color="primary" size="32">
-                <span class="text-caption text-white">{{ m.email?.[0]?.toUpperCase() ?? '?' }}</span>
-              </v-avatar>
+              <UserAvatar :user="m" :size="32" />
             </template>
             <template #append>
               <div class="member-actions">
@@ -129,6 +126,7 @@ import { ref, computed, watch } from 'vue'
 import { userService }   from '@/services/user.service'
 import { useMemberStore } from '@/stores/member.store'
 import { useAuthStore }   from '@/stores/auth.store'
+import UserAvatar from '@/components/common/UserAvatar.vue'
 
 const model = defineModel({ type: Boolean, default: false })
 

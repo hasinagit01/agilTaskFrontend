@@ -17,7 +17,7 @@
             clearable
             hide-details
             density="compact"
-            style="min-width: 220px; margin-right: 16px"
+            class="search-field mr-4"
           />
           <BaseButton prepend-icon="mdi-plus" @click="openCreateDialog">
             Nouveau board
@@ -48,7 +48,7 @@
             <v-card-text class="pa-5">
               <div class="d-flex align-start justify-space-between">
                 <div class="flex-grow-1 mr-2">
-                  <v-avatar color="primary" size="40" rounded="lg" class="mb-3">
+                  <v-avatar color="#d69e2e" size="40" rounded="lg" class="mb-3">
                     <v-icon icon="mdi-view-kanban" size="22" color="white" />
                   </v-avatar>
                   <h3 class="text-body-1 font-weight-semibold mb-1">{{ board.name }}</h3>
@@ -70,12 +70,13 @@
                     <v-list-item
                       prepend-icon="mdi-pencil-outline"
                       title="Renommer"
+                      base-color="primary"
                       @click="openRenameDialog(board)"
                     />
                     <v-list-item
                       prepend-icon="mdi-delete-outline"
                       title="Supprimer"
-                      class="text-error"
+                      base-color="error"
                       @click="openDeleteDialog(board)"
                     />
                   </v-list>
@@ -90,6 +91,7 @@
       <div v-if="boardStore.boards.length && boardStore.hasMore" class="text-center mt-6">
         <v-btn
           variant="tonal"
+          prepend-icon="mdi-chevron-down"
           :loading="boardStore.loading"
           @click="boardStore.loadMore()"
         >
@@ -142,6 +144,7 @@
       v-model="deleteDialog"
       title="Supprimer le board"
       confirm-text="Supprimer"
+      confirm-icon="mdi-delete-outline"
       confirm-color="error"
       @confirm="handleDelete"
       :loading="saving"
@@ -222,6 +225,10 @@ onMounted(() => boardStore.fetchBoards())
 </script>
 
 <style scoped>
+.search-field {
+  min-width: 220px;
+}
+
 .board-card {
   transition: transform 0.15s, box-shadow 0.15s;
   cursor: pointer;

@@ -1,17 +1,13 @@
 <template>
   <DefaultLayout>
     <div>
-      <h1 class="text-h4 font-weight-bold mb-6 page-title">Mon profil</h1>
+      <h1 class="text-h4 font-weight-bold mb-6"><span class="page-title">Mon profil</span></h1>
 
       <v-row>
         <!-- Carte profil -->
         <v-col cols="12" md="4">
           <v-card rounded="xl" elevation="0" border class="text-center pa-4">
-            <v-avatar color="primary" size="96" class="mb-4">
-              <span class="text-h4 text-white font-weight-bold">
-                {{ authStore.userInitials }}
-              </span>
-            </v-avatar>
+            <UserAvatar :user="authStore.currentUser" :size="96" class="mb-4" />
             <div class="text-h6 font-weight-bold mb-1">
               {{ fullName || authStore.currentUser?.email }}
             </div>
@@ -58,6 +54,7 @@
                 <v-btn
                   color="primary"
                   variant="flat"
+                  prepend-icon="mdi-content-save-outline"
                   :loading="savingProfile"
                   @click="handleProfileUpdate"
                 >
@@ -77,6 +74,7 @@
                   prepend-icon="mdi-identifier"
                   title="Identifiant"
                   :subtitle="String(authStore.currentUser?.id)"
+                  base-color="primary"
                   class="px-0"
                 />
                 <v-divider class="my-2" />
@@ -84,6 +82,7 @@
                   prepend-icon="mdi-email-outline"
                   title="Email"
                   :subtitle="authStore.currentUser?.email"
+                  base-color="primary"
                   class="px-0"
                 />
               </v-list>
@@ -124,12 +123,14 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed } from 'vue'
 import DefaultLayout from '@/layouts/DefaultLayout.vue'
 import BaseModal from '@/components/common/BaseModal.vue'
+import UserAvatar from '@/components/common/UserAvatar.vue'
 import { useAuthStore } from '@/stores/auth.store'
 import { useNotificationStore } from '@/stores/notification.store'
 import { userService } from '@/services/user.service'
+import { getUserFullName } from '@/utils/user'
 
 const authStore  = useAuthStore()
 const notifStore = useNotificationStore()
@@ -142,11 +143,7 @@ const emailDialog = ref(false)
 const newEmail    = ref('')
 const savingEmail = ref(false)
 
-const fullName = computed(() => {
-  const u = authStore.currentUser
-  if (u?.firstname || u?.name) return [u.firstname, u.name].filter(Boolean).join(' ')
-  return ''
-})
+const fullName = computed(() => getUserFullName(authStore.currentUser))
 
 const joinDate = computed(() => {
   const d = authStore.currentUser?.created_at
@@ -154,10 +151,6 @@ const joinDate = computed(() => {
   return new Date(d).toLocaleDateString('fr-FR', { day: '2-digit', month: 'long', year: 'numeric' })
 })
 
-onMounted(() => {
-  editFirstname.value = authStore.currentUser?.firstname ?? ''
-  editName.value      = authStore.currentUser?.name ?? ''
-})
 
 async function handleProfileUpdate() {
   savingProfile.value = true

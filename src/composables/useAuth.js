@@ -38,16 +38,8 @@ export function useAuth() {
     router.push(ROUTES.LOGIN)
   }
 
-  function requireAuth() {
-    if (!authStore.isLoggedIn) {
-      router.push(ROUTES.LOGIN)
-      return false
-    }
-    return true
-  }
-
   return {
     isLoggedIn, currentUser, loading,
-    login, register, logout, requireAuth,
+    login, register, logout,
   }
 }

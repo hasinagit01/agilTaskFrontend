@@ -79,7 +79,7 @@
           hide-details
           density="compact"
           clearable
-          style="max-width: 200px; margin-right: 16px"
+          class="filter-select mr-4"
         >
           <template #item="{ item, props: p }">
             <v-list-item v-bind="p">
@@ -99,8 +99,22 @@
           hide-details
           density="compact"
           clearable
-          style="max-width: 200px"
-        />
+          class="filter-select"
+        >
+          <template #item="{ item, props: p }">
+            <v-list-item v-bind="p">
+              <template #prepend>
+                <UserAvatar :user="item.raw" :size="28" class="mr-2" />
+              </template>
+            </v-list-item>
+          </template>
+          <template #selection="{ item }">
+            <div class="d-flex align-center gap-2">
+              <UserAvatar :user="item.raw" :size="20" />
+              <span class="text-body-2">{{ item.raw.email }}</span>
+            </div>
+          </template>
+        </v-select>
 
         <v-chip
           v-if="isFiltered"
@@ -151,10 +165,10 @@
               @keyup.esc="cancelAddColumn"
             />
             <div class="d-flex gap-2">
-              <v-btn color="primary" size="small" variant="flat" :loading="savingColumn" @click="submitAddColumn">
+              <v-btn color="primary" size="small" variant="flat" prepend-icon="mdi-check" :loading="savingColumn" @click="submitAddColumn">
                 Ajouter
               </v-btn>
-              <v-btn variant="text" size="small" @click="cancelAddColumn">Annuler</v-btn>
+              <v-btn variant="text" size="small" prepend-icon="mdi-close" @click="cancelAddColumn">Annuler</v-btn>
             </div>
           </div>
         </div>
@@ -166,6 +180,7 @@
       v-model="deleteColumnDialog"
       title="Supprimer la colonne"
       confirm-text="Supprimer"
+      confirm-icon="mdi-delete-outline"
       confirm-color="error"
       :loading="deletingColumn"
       @confirm="handleDeleteColumn"
@@ -193,6 +208,7 @@
       v-model="deleteCardDialog"
       title="Supprimer la carte"
       confirm-text="Supprimer"
+      confirm-icon="mdi-delete-outline"
       confirm-color="error"
       :loading="deletingCard"
       @confirm="handleDeleteCard"
@@ -223,6 +239,7 @@
       v-model="leaveConfirmOpen"
       title="Modifications non sauvegardées"
       confirm-text="Quitter"
+      confirm-icon="mdi-exit-to-app"
       confirm-color="error"
       @confirm="handleLeaveConfirm"
       @update:model-value="handleLeaveCancel"
@@ -245,6 +262,7 @@ import MemberModal     from '@/components/board/MemberModal.vue'
 import LabelModal      from '@/components/board/LabelModal.vue'
 import ArchivePanel    from '@/components/board/ArchivePanel.vue'
 import ActivityDrawer  from '@/components/board/ActivityDrawer.vue'
+import UserAvatar      from '@/components/common/UserAvatar.vue'
 import { useBoardStore  } from '@/stores/board.store'
 import { useColumnStore } from '@/stores/column.store'
 import { useCardStore   } from '@/stores/card.store'
@@ -497,6 +515,10 @@ onUnmounted(() => {
 </script>
 
 <style scoped>
+.filter-select {
+  max-width: 200px;
+}
+
 .header-actions {
   display: flex;
   align-items: center;

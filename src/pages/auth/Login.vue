@@ -49,7 +49,7 @@
 
         <div class="text-center">
           <span class="text-body-2 text-medium-emphasis">Pas encore de compte ?</span>
-          <v-btn variant="text" color="primary" size="small" :to="{ name: 'Register' }">
+          <v-btn variant="text" color="primary" size="small" prepend-icon="mdi-account-plus-outline" :to="{ name: 'Register' }">
             S'inscrire
           </v-btn>
         </div>

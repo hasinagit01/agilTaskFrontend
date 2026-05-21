@@ -14,16 +14,8 @@ export const useAuthStore = defineStore('auth', () => {
   const loading = ref(false)
 
   // ===== Getters =====
-  const isLoggedIn   = computed(() => !!token.value && !!user.value)
-  const currentUser  = computed(() => user.value)
-  const userInitials = computed(() => {
-    const u = user.value
-    if (u?.firstname && u?.name) {
-      return (u.firstname[0] + u.name[0]).toUpperCase()
-    }
-    if (!u?.email) return '?'
-    return u.email[0].toUpperCase()
-  })
+  const isLoggedIn  = computed(() => !!token.value && !!user.value)
+  const currentUser = computed(() => user.value)
 
   // ===== Refresh automatique =====
   function _scheduleRefresh(tokenValue) {
@@ -107,7 +99,7 @@ export const useAuthStore = defineStore('auth', () => {
 
   return {
     user, token, loading,
-    isLoggedIn, currentUser, userInitials,
+    isLoggedIn, currentUser,
     setAuth, clearAuth, init, login, register, logout, updateUser,
   }
 }, {

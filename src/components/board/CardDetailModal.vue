@@ -91,6 +91,9 @@
               closable
               @click:close="$emit('unassign', { card, userId: a.user_id })"
             >
+              <template #prepend>
+                <UserAvatar :user="a" :size="20" class="mr-1" />
+              </template>
               {{ a.email }}
             </v-chip>
           </div>
@@ -104,7 +107,21 @@
             hide-details
             clearable
             @update:model-value="onAssign"
-          />
+          >
+            <template #item="{ item, props: p }">
+              <v-list-item v-bind="p">
+                <template #prepend>
+                  <UserAvatar :user="item.raw" :size="28" class="mr-2" />
+                </template>
+              </v-list-item>
+            </template>
+            <template #selection="{ item }">
+              <div class="d-flex align-center gap-2">
+                <UserAvatar :user="item.raw" :size="20" />
+                <span class="text-body-2">{{ item.raw.email }}</span>
+              </div>
+            </template>
+          </v-select>
           <p v-else-if="!card.assignees?.length" class="text-caption text-medium-emphasis">
             Aucun membre disponible
           </p>
@@ -123,8 +140,8 @@
           Supprimer
         </v-btn>
         <v-spacer />
-        <v-btn variant="text" @click="model = false">Annuler</v-btn>
-        <v-btn color="primary" variant="flat" :loading="saving" @click="handleSave">
+        <v-btn variant="text" prepend-icon="mdi-close" @click="model = false">Annuler</v-btn>
+        <v-btn color="primary" variant="flat" prepend-icon="mdi-content-save-outline" :loading="saving" @click="handleSave">
           Enregistrer
         </v-btn>
       </v-card-actions>
@@ -136,6 +153,7 @@
 import { ref, computed, watch } from 'vue'
 import { useMemberStore } from '@/stores/member.store'
 import { useLabelStore  } from '@/stores/label.store'
+import UserAvatar from '@/components/common/UserAvatar.vue'
 
 const model = defineModel({ type: Boolean, default: false })
 

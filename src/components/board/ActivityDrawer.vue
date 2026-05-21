@@ -7,7 +7,7 @@
   >
     <div class="d-flex align-center justify-space-between pa-4 border-b">
       <span class="text-h6 font-weight-semibold">
-        <v-icon icon="mdi-history" class="mr-2" />
+        <v-icon icon="mdi-history" color="primary" class="mr-2" />
         Activité
       </span>
       <v-btn icon="mdi-close" variant="text" density="compact" @click="model = false" />

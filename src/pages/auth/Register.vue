@@ -54,7 +54,7 @@
 
         <div class="text-center mt-6">
           <span class="text-body-2 text-medium-emphasis">Déjà un compte ?</span>
-          <v-btn variant="text" color="primary" size="small" :to="{ name: 'Login' }">
+          <v-btn variant="text" color="primary" size="small" prepend-icon="mdi-login" :to="{ name: 'Login' }">
             Se connecter
           </v-btn>
         </div>

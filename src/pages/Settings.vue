@@ -1,14 +1,14 @@
 <template>
   <DefaultLayout>
     <div>
-      <h1 class="text-h4 font-weight-bold mb-6 page-title">Paramètres</h1>
+      <h1 class="text-h4 font-weight-bold mb-6"><span class="page-title">Paramètres</span></h1>
 
       <v-row>
         <v-col cols="12" md="6">
           <!-- Apparence -->
           <v-card rounded="xl" elevation="0" border>
             <v-card-title class="pa-5 pb-2 font-weight-semibold">
-              <v-icon icon="mdi-palette-outline" class="mr-2" />
+              <v-icon icon="mdi-palette-outline" color="primary" class="mr-2" />
               Apparence
             </v-card-title>
             <v-card-text class="px-5 pb-5">
@@ -27,7 +27,7 @@
           <!-- Sécurité -->
           <v-card rounded="xl" elevation="0" border class="mb-4">
             <v-card-title class="pa-5 pb-2 font-weight-semibold">
-              <v-icon icon="mdi-lock-outline" class="mr-2" />
+              <v-icon icon="mdi-lock-outline" color="primary" class="mr-2" />
               Sécurité
             </v-card-title>
             <v-card-text class="px-5 pb-5">
@@ -48,7 +48,7 @@
           <!-- Danger zone -->
           <v-card rounded="xl" elevation="0" border color="error" variant="tonal">
             <v-card-title class="pa-5 pb-2 font-weight-semibold text-error">
-              <v-icon icon="mdi-alert-outline" class="mr-2" />
+              <v-icon icon="mdi-alert-outline" color="error" class="mr-2" />
               Zone dangereuse
             </v-card-title>
             <v-card-text class="px-5 pb-5">
@@ -74,6 +74,7 @@
       v-model="passwordDialog"
       title="Changer le mot de passe"
       confirm-text="Enregistrer"
+      confirm-icon="mdi-content-save-outline"
       @confirm="handlePasswordChange"
       :loading="savingPassword"
     >
@@ -105,6 +106,7 @@
       v-model="deleteDialog"
       title="Supprimer mon compte"
       confirm-text="Supprimer définitivement"
+      confirm-icon="mdi-delete-forever"
       confirm-color="error"
       @confirm="handleDeleteAccount"
       :loading="savingDelete"

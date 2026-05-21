@@ -2,9 +2,7 @@
   <div class="fill-height d-flex align-center justify-center">
     <div class="text-center px-4">
       <v-icon :icon="config.icon" size="96" :color="config.color" class="mb-4" />
-      <h1 class="text-h2 font-weight-bold mb-2" :class="`text-${config.color}`">
-        {{ config.code }}
-      </h1>
+      <h1 class="text-h2 font-weight-bold mb-2"><span class="page-title">{{ config.code }}</span></h1>
       <h2 class="text-h5 mb-4">{{ config.title }}</h2>
       <p class="text-medium-emphasis mb-8 text-body-1">{{ config.description }}</p>
 

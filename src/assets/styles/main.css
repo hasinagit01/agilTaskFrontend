@@ -61,10 +61,61 @@ body {
 
 /* ===== Page titles ===== */
 .page-title {
-  background: linear-gradient(135deg, #6366f1, #3b82f6);
+  display: inline-block;
+  background: linear-gradient(135deg, #6366f1, #d69e2e);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
+}
+
+/* Empêche l'héritage de text-fill sur les boutons et inputs */
+.v-btn,
+.v-btn *,
+.v-field,
+.v-field * {
+  -webkit-text-fill-color: unset;
+}
+
+/* Texte et icônes blancs sur boutons elevated/flat colorés en mode clair */
+.v-theme--light .v-btn--variant-elevated .v-btn__content,
+.v-theme--light .v-btn--variant-flat .v-btn__content {
+  color: #ffffff !important;
+}
+
+.v-theme--light .v-btn--variant-elevated .v-icon,
+.v-theme--light .v-btn--variant-flat .v-icon {
+  color: #ffffff !important;
+}
+
+/* Texte et icônes blancs sur chips flat/elevated (pas tonal ni default) */
+/* .v-chip__close = icône de fermeture (closable), .v-chip__filter = icône filtre */
+.v-theme--light .v-chip--variant-flat .v-chip__content,
+.v-theme--light .v-chip--variant-flat .v-chip__close,
+.v-theme--light .v-chip--variant-flat .v-chip__close .v-icon,
+.v-theme--light .v-chip--variant-flat .v-chip__filter,
+.v-theme--light .v-chip--variant-elevated .v-chip__content,
+.v-theme--light .v-chip--variant-elevated .v-chip__close,
+.v-theme--light .v-chip--variant-elevated .v-chip__close .v-icon,
+.v-theme--light .v-chip--variant-elevated .v-chip__filter {
+  color: #ffffff !important;
+}
+
+/* ===== Utilitaire : icône / texte blanc sur fond coloré ===== */
+/* Usage : ajouter la classe .icon-on-fill sur l'icône ou son conteneur direct  */
+.v-theme--light .icon-on-fill,
+.v-theme--light .icon-on-fill .v-icon { color: #ffffff !important; }
+
+/* Icônes blanches dans les avatars non-tonals uniquement */
+.v-theme--light .v-avatar:not(.v-avatar--variant-tonal) span,
+.v-theme--light .v-avatar:not(.v-avatar--variant-tonal) .v-icon {
+  color: #ffffff !important;
+}
+
+/* Hover amber uniquement sur boutons elevated/flat (pas text, tonal, outlined, icon) */
+.v-theme--light .v-btn--variant-elevated:hover,
+.v-theme--light .v-btn--variant-flat:hover {
+  background-color: #d69e2e !important;
+  color: #fff !important;
 }
 
 /* ===== Scrollbar ===== */

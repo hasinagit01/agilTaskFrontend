@@ -44,10 +44,10 @@
           <v-btn icon="mdi-dots-vertical" variant="text" size="x-small" v-bind="menuProps" />
         </template>
         <v-list>
-          <v-list-item prepend-icon="mdi-pencil-outline" title="Renommer" @click="startEditName" />
-          <v-list-item prepend-icon="mdi-archive-arrow-down-outline" title="Archiver" @click="$emit('archive-column', { boardId: props.column.board_id, columnId: props.column.id })" />
+          <v-list-item prepend-icon="mdi-pencil-outline" title="Renommer" base-color="primary" @click="startEditName" />
+          <v-list-item prepend-icon="mdi-archive-arrow-down-outline" title="Archiver" base-color="primary" @click="$emit('archive-column', { boardId: props.column.board_id, columnId: props.column.id })" />
           <v-divider />
-          <v-list-item prepend-icon="mdi-delete-outline" title="Supprimer" class="text-error" @click="$emit('delete', column)" />
+          <v-list-item prepend-icon="mdi-delete-outline" title="Supprimer" base-color="error" @click="$emit('delete', column)" />
         </v-list>
       </v-menu>
     </div>
@@ -93,10 +93,10 @@
         @keyup.esc="cancelNewCard"
       />
       <div class="d-flex gap-2">
-        <v-btn color="primary" size="small" variant="flat" :loading="savingCard" @click="submitNewCard">
+        <v-btn color="primary" size="small" variant="flat" prepend-icon="mdi-check" :loading="savingCard" @click="submitNewCard">
           Ajouter
         </v-btn>
-        <v-btn variant="text" size="small" @click="cancelNewCard">Annuler</v-btn>
+        <v-btn variant="text" size="small" prepend-icon="mdi-close" @click="cancelNewCard">Annuler</v-btn>
       </div>
     </div>
   </div>
