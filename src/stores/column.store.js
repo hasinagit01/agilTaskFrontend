@@ -70,8 +70,26 @@ export const useColumnStore = defineStore('column', () => {
     columns.value = []
   }
 
+  function wsHandleColumnCreated(column) {
+    if (!columns.value.find(c => c.id === column.id)) columns.value.push(column)
+  }
+
+  function wsHandleColumnUpdated(column) {
+    const idx = columns.value.findIndex(c => c.id === column.id)
+    if (idx !== -1) columns.value[idx] = column
+  }
+
+  function wsHandleColumnDeleted({ column_id }) {
+    columns.value = columns.value.filter(c => c.id !== column_id)
+  }
+
+  function wsHandleColumnsReordered({ columns: updated }) {
+    columns.value = updated
+  }
+
   return {
     columns, loading,
     fetchColumns, createColumn, updateColumn, removeColumn, reorderColumns, reset,
+    wsHandleColumnCreated, wsHandleColumnUpdated, wsHandleColumnDeleted, wsHandleColumnsReordered,
   }
 })

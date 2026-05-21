@@ -167,4 +167,62 @@ describe('column.store', () => {
       expect(store.columns).toEqual([])
     })
   })
+
+  // ===== WebSocket handlers =====
+
+  describe('wsHandleColumnCreated()', () => {
+    it('ajoute la colonne si elle n\'est pas déjà présente', () => {
+      const store = useColumnStore()
+      store.columns = [...MOCK_COLUMNS]
+      const newCol = { id: 10, name: 'Review', position: 3, board_id: 1 }
+      store.wsHandleColumnCreated(newCol)
+      expect(store.columns).toContainEqual(newCol)
+      expect(store.columns).toHaveLength(4)
+    })
+
+    it('ne duplique pas une colonne déjà présente', () => {
+      const store = useColumnStore()
+      store.columns = [...MOCK_COLUMNS]
+      store.wsHandleColumnCreated(MOCK_COLUMNS[0])
+      expect(store.columns).toHaveLength(3)
+    })
+  })
+
+  describe('wsHandleColumnUpdated()', () => {
+    it('remplace la colonne dans la liste', () => {
+      const store = useColumnStore()
+      store.columns = [...MOCK_COLUMNS]
+      const updated = { id: 1, name: 'Renamed', position: 0, board_id: 1 }
+      store.wsHandleColumnUpdated(updated)
+      expect(store.columns.find(c => c.id === 1).name).toBe('Renamed')
+    })
+
+    it('ne fait rien si la colonne est inconnue', () => {
+      const store = useColumnStore()
+      store.columns = [...MOCK_COLUMNS]
+      store.wsHandleColumnUpdated({ id: 99, name: 'X', position: 0, board_id: 1 })
+      expect(store.columns).toHaveLength(3)
+    })
+  })
+
+  describe('wsHandleColumnDeleted()', () => {
+    it('retire la colonne de la liste', () => {
+      const store = useColumnStore()
+      store.columns = [...MOCK_COLUMNS]
+      store.wsHandleColumnDeleted({ column_id: 1 })
+      expect(store.columns.find(c => c.id === 1)).toBeUndefined()
+      expect(store.columns).toHaveLength(2)
+    })
+  })
+
+  describe('wsHandleColumnsReordered()', () => {
+    it('remplace la liste entière', () => {
+      const store = useColumnStore()
+      store.columns = [...MOCK_COLUMNS]
+      const reordered = [MOCK_COLUMNS[2], MOCK_COLUMNS[0], MOCK_COLUMNS[1]]
+      store.wsHandleColumnsReordered({ columns: reordered })
+      expect(store.columns[0].id).toBe(3)
+      expect(store.columns[1].id).toBe(1)
+    })
+  })
 })

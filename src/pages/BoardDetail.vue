@@ -10,8 +10,21 @@
             size="small"
             :to="{ name: 'Home' }"
           />
-          <div>
+          <div class="d-flex align-center gap-2">
             <h1 class="text-h5 font-weight-bold page-title">{{ boardStore.currentBoard?.name }}</h1>
+            <v-tooltip
+              v-if="!loading"
+              :text="realtimeStore.connected ? 'Temps réel actif' : 'Connexion interrompue'"
+              location="bottom"
+            >
+              <template #activator="{ props }">
+                <span
+                  v-bind="props"
+                  class="ws-dot"
+                  :class="realtimeStore.connected ? 'ws-dot--on' : 'ws-dot--off'"
+                />
+              </template>
+            </v-tooltip>
           </div>
         </div>
         <div class="header-actions">
@@ -271,6 +284,7 @@ import { useMemberStore } from '@/stores/member.store'
 import { useAuthStore   } from '@/stores/auth.store'
 import { useArchiveStore }   from '@/stores/archive.store'
 import { useActivityStore }  from '@/stores/activity.store'
+import { useRealtimeStore }  from '@/stores/realtime.store'
 import { labelService   } from '@/services/label.service'
 import { assigneeService } from '@/services/assignee.service'
 
@@ -312,8 +326,9 @@ function filteredCards(columnId) {
   return cards
 }
 
-const archiveStore  = useArchiveStore()
-const activityStore = useActivityStore()
+const archiveStore    = useArchiveStore()
+const activityStore   = useActivityStore()
+const realtimeStore   = useRealtimeStore()
 const archiveOpen   = ref(false)
 const activityOpen  = ref(false)
 
@@ -507,9 +522,13 @@ watch(
   (name) => { if (name) document.title = `${name} · Agil Task` },
 )
 
-onMounted(loadBoard)
+onMounted(async () => {
+  await loadBoard()
+  realtimeStore.connect(boardId.value)
+})
 
 onUnmounted(() => {
+  realtimeStore.disconnect()
   columnStore.reset()
   cardStore.reset()
   labelStore.reset()
@@ -547,6 +566,16 @@ onUnmounted(() => {
   padding-bottom: 16px;
   flex: 1;
 }
+.ws-dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  cursor: default;
+}
+.ws-dot--on  { background: #4caf50; box-shadow: 0 0 5px #4caf5088; }
+.ws-dot--off { background: #ff9800; }
 .kanban-board {
   display: flex;
   gap: 12px;

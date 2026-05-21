@@ -192,4 +192,101 @@ describe('card.store', () => {
       expect(store.cardsByColumn).toEqual({})
     })
   })
+
+  // ===== WebSocket handlers =====
+
+  describe('wsHandleCardCreated()', () => {
+    it('ajoute la carte si la colonne est chargée', () => {
+      const store = useCardStore()
+      store.cardsByColumn[1] = [...CARDS_COL_1]
+      const newCard = { id: 99, title: 'New', position: 2, column_id: 1 }
+      store.wsHandleCardCreated(newCard)
+      expect(store.cardsByColumn[1]).toContainEqual(newCard)
+    })
+
+    it('ne fait rien si la colonne n\'est pas chargée', () => {
+      const store = useCardStore()
+      store.wsHandleCardCreated({ id: 99, title: 'X', position: 0, column_id: 1 })
+      expect(store.cardsByColumn[1]).toBeUndefined()
+    })
+
+    it('ne duplique pas une carte déjà présente', () => {
+      const store = useCardStore()
+      store.cardsByColumn[1] = [...CARDS_COL_1]
+      store.wsHandleCardCreated(CARDS_COL_1[0])
+      expect(store.cardsByColumn[1]).toHaveLength(2)
+    })
+
+    it('trie par position après ajout', () => {
+      const store = useCardStore()
+      store.cardsByColumn[1] = [{ id: 2, title: 'B', position: 1, column_id: 1 }]
+      store.wsHandleCardCreated({ id: 1, title: 'A', position: 0, column_id: 1 })
+      expect(store.cardsByColumn[1][0].id).toBe(1)
+      expect(store.cardsByColumn[1][1].id).toBe(2)
+    })
+  })
+
+  describe('wsHandleCardUpdated()', () => {
+    it('remplace la carte dans sa colonne', () => {
+      const store = useCardStore()
+      store.cardsByColumn[1] = [...CARDS_COL_1]
+      const updated = { id: 1, title: 'Modifié', position: 0, column_id: 1 }
+      store.wsHandleCardUpdated(updated)
+      expect(store.cardsByColumn[1].find(c => c.id === 1).title).toBe('Modifié')
+    })
+
+    it('ne fait rien si la colonne n\'est pas chargée', () => {
+      const store = useCardStore()
+      store.wsHandleCardUpdated({ id: 1, title: 'X', position: 0, column_id: 1 })
+      expect(store.cardsByColumn[1]).toBeUndefined()
+    })
+  })
+
+  describe('wsHandleCardMoved()', () => {
+    it('retire de la colonne source et ajoute dans la cible', () => {
+      const store = useCardStore()
+      store.cardsByColumn[1] = [...CARDS_COL_1]
+      store.cardsByColumn[2] = [...CARDS_COL_2]
+      const movedCard = { id: 1, title: 'Card A', position: 0, column_id: 2, from_column_id: 1 }
+      store.wsHandleCardMoved(movedCard)
+      expect(store.cardsByColumn[1].find(c => c.id === 1)).toBeUndefined()
+      expect(store.cardsByColumn[2].find(c => c.id === 1)).toBeDefined()
+    })
+
+    it('trie la colonne cible par position', () => {
+      const store = useCardStore()
+      store.cardsByColumn[1] = [{ id: 1, title: 'A', position: 0, column_id: 1 }]
+      store.cardsByColumn[2] = [{ id: 3, title: 'C', position: 1, column_id: 2 }]
+      const moved = { id: 1, title: 'A', position: 0, column_id: 2, from_column_id: 1 }
+      store.wsHandleCardMoved(moved)
+      expect(store.cardsByColumn[2][0].id).toBe(1)
+    })
+  })
+
+  describe('wsHandleCardDeleted()', () => {
+    it('retire la carte de sa colonne', () => {
+      const store = useCardStore()
+      store.cardsByColumn[1] = [...CARDS_COL_1]
+      store.wsHandleCardDeleted({ card_id: 1, column_id: 1 })
+      expect(store.cardsByColumn[1].find(c => c.id === 1)).toBeUndefined()
+      expect(store.cardsByColumn[1]).toHaveLength(1)
+    })
+
+    it('ne fait rien si la colonne n\'est pas chargée', () => {
+      const store = useCardStore()
+      store.wsHandleCardDeleted({ card_id: 1, column_id: 99 })
+      expect(store.cardsByColumn[99]).toBeUndefined()
+    })
+  })
+
+  describe('wsHandleCardsReordered()', () => {
+    it('remplace la liste des cartes de la colonne', () => {
+      const store = useCardStore()
+      store.cardsByColumn[1] = [...CARDS_COL_1]
+      const reordered = [CARDS_COL_1[1], CARDS_COL_1[0]]
+      store.wsHandleCardsReordered({ column_id: 1, cards: reordered })
+      expect(store.cardsByColumn[1][0].id).toBe(2)
+      expect(store.cardsByColumn[1][1].id).toBe(1)
+    })
+  })
 })
