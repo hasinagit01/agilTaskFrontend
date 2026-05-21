@@ -13,6 +13,14 @@ vi.mock('@/services/archive.service', () => ({
   },
 }))
 
+vi.mock('@/services/card.service', () => ({
+  cardService: { remove: vi.fn() },
+}))
+
+vi.mock('@/services/column.service', () => ({
+  columnService: { remove: vi.fn() },
+}))
+
 vi.mock('@/stores/notification.store', () => ({
   useNotificationStore: () => ({ success: vi.fn(), error: vi.fn() }),
 }))
@@ -30,6 +38,8 @@ vi.mock('@/stores/column.store', () => ({
 }))
 
 import { archiveService } from '@/services/archive.service'
+import { cardService }    from '@/services/card.service'
+import { columnService }  from '@/services/column.service'
 
 describe('archive.store', () => {
   beforeEach(() => {
@@ -104,6 +114,54 @@ describe('archive.store', () => {
       await store.restoreColumn(1, 1)
 
       expect(store.archivedColumns).toHaveLength(0)
+    })
+  })
+
+  describe('deleteArchivedCard()', () => {
+    it('supprime la carte et la retire des archives', async () => {
+      cardService.remove.mockResolvedValue({})
+
+      const store = useArchiveStore()
+      const card  = { id: 10, title: 'Card A', column_id: 1 }
+      store.archivedCards = [card]
+      await store.deleteArchivedCard(1, card)
+
+      expect(cardService.remove).toHaveBeenCalledWith(1, 1, 10)
+      expect(store.archivedCards).toHaveLength(0)
+    })
+
+    it('conserve la carte en cas d\'erreur', async () => {
+      cardService.remove.mockRejectedValue({ message: 'Erreur' })
+
+      const store = useArchiveStore()
+      const card  = { id: 10, title: 'Card A', column_id: 1 }
+      store.archivedCards = [card]
+      await store.deleteArchivedCard(1, card)
+
+      expect(store.archivedCards).toHaveLength(1)
+    })
+  })
+
+  describe('deleteArchivedColumn()', () => {
+    it('supprime la colonne et la retire des archives', async () => {
+      columnService.remove.mockResolvedValue({})
+
+      const store = useArchiveStore()
+      store.archivedColumns = [{ id: 1, name: 'Todo' }]
+      await store.deleteArchivedColumn(1, 1)
+
+      expect(columnService.remove).toHaveBeenCalledWith(1, 1)
+      expect(store.archivedColumns).toHaveLength(0)
+    })
+
+    it('conserve la colonne en cas d\'erreur', async () => {
+      columnService.remove.mockRejectedValue({ message: 'Erreur' })
+
+      const store = useArchiveStore()
+      store.archivedColumns = [{ id: 1, name: 'Todo' }]
+      await store.deleteArchivedColumn(1, 1)
+
+      expect(store.archivedColumns).toHaveLength(1)
     })
   })
 

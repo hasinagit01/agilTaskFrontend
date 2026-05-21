@@ -94,6 +94,65 @@ describe('auth.store', () => {
     })
   })
 
+  // ===== register() =====
+  describe('register()', () => {
+    it('stocke user et token en cas de succès', async () => {
+      authService.register.mockResolvedValue({ user: MOCK_USER, token: MOCK_TOKEN })
+
+      const store  = useAuthStore()
+      const result = await store.register({ email: MOCK_USER.email, password: 'secret123' })
+
+      expect(result.success).toBe(true)
+      expect(store.user).toEqual(MOCK_USER)
+      expect(store.isLoggedIn).toBe(true)
+    })
+
+    it('retourne success: false en cas d\'erreur', async () => {
+      authService.register.mockRejectedValue({ message: 'Email déjà utilisé' })
+
+      const store  = useAuthStore()
+      const result = await store.register({ email: 'taken@example.com', password: 'secret' })
+
+      expect(result.success).toBe(false)
+      expect(store.user).toBeNull()
+    })
+  })
+
+  // ===== logout() =====
+  describe('logout()', () => {
+    it('efface l\'authentification', async () => {
+      authService.login.mockResolvedValue({ user: MOCK_USER, token: MOCK_TOKEN })
+
+      const store = useAuthStore()
+      await store.login({ email: MOCK_USER.email, password: '123456' })
+      await store.logout()
+
+      expect(store.user).toBeNull()
+      expect(store.token).toBeNull()
+      expect(store.isLoggedIn).toBe(false)
+    })
+  })
+
+  // ===== updateUser() =====
+  describe('updateUser()', () => {
+    it('applique le patch sur l\'utilisateur courant', async () => {
+      authService.login.mockResolvedValue({ user: MOCK_USER, token: MOCK_TOKEN })
+
+      const store = useAuthStore()
+      await store.login({ email: MOCK_USER.email, password: '123456' })
+      store.updateUser({ firstname: 'Jean', name: 'Dupont' })
+
+      expect(store.currentUser.firstname).toBe('Jean')
+      expect(store.currentUser.name).toBe('Dupont')
+      expect(store.currentUser.email).toBe(MOCK_USER.email)
+    })
+
+    it('ne plante pas si user est null', () => {
+      const store = useAuthStore()
+      expect(() => store.updateUser({ firstname: 'Jean' })).not.toThrow()
+    })
+  })
+
   // ===== isLoggedIn =====
   describe('isLoggedIn', () => {
     it('est false si seulement le token est présent', async () => {

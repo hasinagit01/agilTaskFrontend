@@ -128,6 +128,56 @@ describe('board.store', () => {
     })
   })
 
+  // ===== loadMore() & hasMore =====
+  describe('loadMore()', () => {
+    it('charge la page suivante et accumule les boards', async () => {
+      const page1 = [{ id: 1, name: 'Board A' }, { id: 2, name: 'Board B' }]
+      const page2 = [{ id: 3, name: 'Board C' }]
+      boardService.getAll
+        .mockResolvedValueOnce({ data: page1, total: 3 })
+        .mockResolvedValueOnce({ data: page2, total: 3 })
+
+      const store = useBoardStore()
+      await store.fetchBoards()
+      expect(store.hasMore).toBe(true)
+
+      await store.loadMore()
+      expect(store.boards).toHaveLength(3)
+      expect(store.hasMore).toBe(false)
+    })
+
+    it('ne charge pas si hasMore est false', async () => {
+      boardService.getAll.mockResolvedValue({ data: MOCK_BOARDS, total: 2 })
+
+      const store = useBoardStore()
+      await store.fetchBoards()
+      expect(store.hasMore).toBe(false)
+
+      await store.loadMore()
+      expect(boardService.getAll).toHaveBeenCalledTimes(1)
+    })
+  })
+
+  describe('hasMore', () => {
+    it('est true si boards.length < total', async () => {
+      boardService.getAll.mockResolvedValue({ data: MOCK_BOARDS, total: 5 })
+
+      const store = useBoardStore()
+      await store.fetchBoards()
+
+      expect(store.hasMore).toBe(true)
+    })
+
+    it('est false si tous les boards sont chargés', async () => {
+      boardService.getAll.mockResolvedValue({ data: MOCK_BOARDS, total: 2 })
+
+      const store = useBoardStore()
+      await store.fetchBoards()
+
+      expect(store.hasMore).toBe(false)
+    })
+  })
+
   // ===== removeBoard() =====
   describe('removeBoard()', () => {
     it('retire le board de la liste', async () => {
