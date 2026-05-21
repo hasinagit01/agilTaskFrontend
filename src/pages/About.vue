@@ -9,7 +9,7 @@
         <v-col cols="12">
           <v-card rounded="xl" elevation="0" border class="mb-4">
             <v-card-text class="pa-6">
-              <div class="d-flex align-center mb-4" style="gap: 16px">
+              <div class="d-flex align-center mb-4 ga-4">
                 <v-icon icon="mdi-view-kanban" color="primary" size="48" />
                 <div>
                   <div class="text-h5 font-weight-bold">Agil Task</div>
@@ -33,7 +33,7 @@
                   sm="6"
                   md="4"
                 >
-                  <div class="d-flex align-start" style="gap: 12px">
+                  <div class="d-flex align-start ga-3">
                     <v-avatar :color="feature.color" size="36" rounded="lg">
                       <v-icon :icon="feature.icon" size="18" color="white" />
                     </v-avatar>
@@ -52,7 +52,7 @@
         <v-col cols="12">
           <v-card rounded="xl" elevation="0" border>
             <v-card-text class="pa-6">
-              <div class="d-flex align-center mb-4" style="gap: 16px">
+              <div class="d-flex align-center mb-4 ga-4">
                 <v-icon icon="mdi-code-braces" color="primary" size="48" />
                 <div>
                   <div class="text-h5 font-weight-bold">WalkingDev</div>

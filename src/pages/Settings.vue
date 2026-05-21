@@ -3,7 +3,18 @@
     <div>
       <h1 class="text-h4 font-weight-bold mb-6"><span class="page-title">Paramètres</span></h1>
 
-      <v-row>
+      <!-- Skeleton de chargement -->
+      <v-row v-if="!authStore.currentUser">
+        <v-col cols="12" md="6">
+          <v-skeleton-loader type="article" rounded="xl" />
+        </v-col>
+        <v-col cols="12" md="6">
+          <v-skeleton-loader type="article" rounded="xl" class="mb-4" />
+          <v-skeleton-loader type="article" rounded="xl" />
+        </v-col>
+      </v-row>
+
+      <v-row v-else>
         <v-col cols="12" md="6">
           <!-- Apparence -->
           <v-card rounded="xl" elevation="0" border>

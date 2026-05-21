@@ -12,19 +12,21 @@ const Settings    = () => import('@/pages/Settings.vue')
 const NotFound    = () => import('@/pages/NotFound.vue')
 const ErrorPage   = () => import('@/pages/Error.vue')
 
+const APP_TITLE = 'Agil Task'
+
 const routes = [
   // ===== Routes publiques =====
   {
     path: '/login',
     name: 'Login',
     component: Login,
-    meta: { layout: 'auth', guestOnly: true },
+    meta: { layout: 'auth', guestOnly: true, title: 'Connexion' },
   },
   {
     path: '/register',
     name: 'Register',
     component: Register,
-    meta: { layout: 'auth', guestOnly: true },
+    meta: { layout: 'auth', guestOnly: true, title: 'Inscription' },
   },
 
   // ===== Routes protégées =====
@@ -32,30 +34,31 @@ const routes = [
     path: '/',
     name: 'Home',
     component: Home,
-    meta: { requiresAuth: true },
+    meta: { requiresAuth: true, title: 'Mes boards' },
   },
   {
     path: '/boards/:id',
     name: 'BoardDetail',
     component: BoardDetail,
-    meta: { requiresAuth: true },
+    meta: { requiresAuth: true }, // titre dynamique géré dans le composant
   },
   {
     path: '/about',
     name: 'About',
     component: About,
+    meta: { title: 'À propos' },
   },
   {
     path: '/profile',
     name: 'Profile',
     component: Profile,
-    meta: { requiresAuth: true },
+    meta: { requiresAuth: true, title: 'Mon profil' },
   },
   {
     path: '/settings',
     name: 'Settings',
     component: Settings,
-    meta: { requiresAuth: true },
+    meta: { requiresAuth: true, title: 'Paramètres' },
   },
 
   // ===== Pages d'erreur =====
@@ -63,11 +66,13 @@ const routes = [
     path: '/error',
     name: 'Error',
     component: ErrorPage,
+    meta: { title: 'Erreur' },
   },
   {
     path: '/:pathMatch(.*)*',
     name: 'NotFound',
     component: NotFound,
+    meta: { title: 'Page introuvable' },
   },
 ]
 
@@ -81,8 +86,14 @@ const router = createRouter({
   },
 })
 
+// ===== Titre dynamique =====
+router.afterEach((to) => {
+  const pageTitle = to.meta?.title
+  document.title = pageTitle ? `${pageTitle} · ${APP_TITLE}` : APP_TITLE
+})
+
 // ===== Navigation Guards =====
-router.beforeEach((to, from, next) => {
+router.beforeEach((to, _from, next) => {
   const authStore = useAuthStore()
 
   if (to.meta.requiresAuth && !authStore.isLoggedIn) {

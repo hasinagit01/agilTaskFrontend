@@ -58,6 +58,16 @@
                     >
                       Restaurer
                     </v-btn>
+                    <v-btn
+                      size="small"
+                      variant="tonal"
+                      color="error"
+                      prepend-icon="mdi-delete-outline"
+                      :loading="deletingCardId === card.id"
+                      @click="askDelete('card', card)"
+                    >
+                      Supprimer
+                    </v-btn>
                   </div>
                 </template>
               </v-list-item>
@@ -86,16 +96,28 @@
                   </v-avatar>
                 </template>
                 <template #append>
-                  <v-btn
-                    size="small"
-                    variant="tonal"
-                    color="primary"
-                    prepend-icon="mdi-restore"
-                    :loading="restoringColumnId === col.id"
-                    @click="handleRestoreColumn(col)"
-                  >
-                    Restaurer
-                  </v-btn>
+                  <div class="d-flex gap-2">
+                    <v-btn
+                      size="small"
+                      variant="tonal"
+                      color="primary"
+                      prepend-icon="mdi-restore"
+                      :loading="restoringColumnId === col.id"
+                      @click="handleRestoreColumn(col)"
+                    >
+                      Restaurer
+                    </v-btn>
+                    <v-btn
+                      size="small"
+                      variant="tonal"
+                      color="error"
+                      prepend-icon="mdi-delete-outline"
+                      :loading="deletingColumnId === col.id"
+                      @click="askDelete('column', col)"
+                    >
+                      Supprimer
+                    </v-btn>
+                  </div>
                 </template>
               </v-list-item>
             </v-list>
@@ -103,6 +125,32 @@
 
         </v-tabs-window>
       </v-card-text>
+    </v-card>
+  </v-dialog>
+
+  <v-dialog v-model="confirmDialog" max-width="420" persistent>
+    <v-card rounded="xl">
+      <v-card-title class="pa-5 pb-2 font-weight-semibold text-error">
+        <v-icon icon="mdi-alert-outline" color="error" class="mr-2" />
+        Suppression définitive
+      </v-card-title>
+      <v-card-text class="pa-5 pt-2">
+        Supprimer <strong>{{ pendingDelete?.item?.title ?? pendingDelete?.item?.name }}</strong> définitivement ?
+        Cette action est irréversible.
+      </v-card-text>
+      <v-card-actions class="pa-4 gap-2">
+        <v-spacer />
+        <v-btn variant="text" prepend-icon="mdi-close" @click="confirmDialog = false">Annuler</v-btn>
+        <v-btn
+          color="error"
+          variant="flat"
+          prepend-icon="mdi-delete-forever"
+          :loading="deletingCardId !== null || deletingColumnId !== null"
+          @click="confirmDelete"
+        >
+          Supprimer définitivement
+        </v-btn>
+      </v-card-actions>
     </v-card>
   </v-dialog>
 </template>
@@ -122,6 +170,31 @@ const tab = ref('cards')
 
 const restoringCardId   = ref(null)
 const restoringColumnId = ref(null)
+const deletingCardId    = ref(null)
+const deletingColumnId  = ref(null)
+
+const confirmDialog  = ref(false)
+const pendingDelete  = ref(null) // { type: 'card'|'column', item }
+
+function askDelete(type, item) {
+  pendingDelete.value = { type, item }
+  confirmDialog.value = true
+}
+
+async function confirmDelete() {
+  const { type, item } = pendingDelete.value
+  if (type === 'card') {
+    deletingCardId.value = item.id
+    await archiveStore.deleteArchivedCard(props.boardId, item)
+    deletingCardId.value = null
+  } else {
+    deletingColumnId.value = item.id
+    await archiveStore.deleteArchivedColumn(props.boardId, item.id)
+    deletingColumnId.value = null
+  }
+  confirmDialog.value = false
+  pendingDelete.value = null
+}
 
 async function handleRestoreCard(card) {
   restoringCardId.value = card.id

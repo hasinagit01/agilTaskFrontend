@@ -250,7 +250,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { ref, computed, watch, onMounted, onUnmounted } from 'vue'
 import { useDisplay } from 'vuetify'
 import { useRoute, useRouter, onBeforeRouteLeave } from 'vue-router'
 import DefaultLayout   from '@/layouts/DefaultLayout.vue'
@@ -501,6 +501,11 @@ async function loadBoard() {
   archiveStore.fetchArchives(boardId.value)
   loading.value = false
 }
+
+watch(
+  () => boardStore.currentBoard?.name,
+  (name) => { if (name) document.title = `${name} · Agil Task` },
+)
 
 onMounted(loadBoard)
 

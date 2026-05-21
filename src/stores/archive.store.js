@@ -1,6 +1,8 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
 import { archiveService } from '@/services/archive.service'
+import { cardService }    from '@/services/card.service'
+import { columnService }  from '@/services/column.service'
 import { useNotificationStore } from './notification.store'
 import { useCardStore } from './card.store'
 import { useColumnStore } from './column.store'
@@ -82,6 +84,26 @@ export const useArchiveStore = defineStore('archive', () => {
     }
   }
 
+  async function deleteArchivedCard(boardId, card) {
+    try {
+      await cardService.remove(boardId, card.column_id, card.id)
+      archivedCards.value = archivedCards.value.filter(c => c.id !== card.id)
+      useNotificationStore().success('Carte supprimée définitivement.')
+    } catch (err) {
+      useNotificationStore().error(err.message || 'Erreur lors de la suppression')
+    }
+  }
+
+  async function deleteArchivedColumn(boardId, columnId) {
+    try {
+      await columnService.remove(boardId, columnId)
+      archivedColumns.value = archivedColumns.value.filter(c => c.id !== columnId)
+      useNotificationStore().success('Colonne supprimée définitivement.')
+    } catch (err) {
+      useNotificationStore().error(err.message || 'Erreur lors de la suppression')
+    }
+  }
+
   function reset() {
     archivedCards.value   = []
     archivedColumns.value = []
@@ -89,6 +111,7 @@ export const useArchiveStore = defineStore('archive', () => {
 
   return {
     archivedCards, archivedColumns, loading,
-    fetchArchives, archiveCard, restoreCard, archiveColumn, restoreColumn, reset,
+    fetchArchives, archiveCard, restoreCard, archiveColumn, restoreColumn,
+    deleteArchivedCard, deleteArchivedColumn, reset,
   }
 })
