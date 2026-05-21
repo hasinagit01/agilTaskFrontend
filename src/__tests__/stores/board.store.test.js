@@ -178,6 +178,35 @@ describe('board.store', () => {
     })
   })
 
+  // ===== wsHandleBoardRenamed() =====
+  describe('wsHandleBoardRenamed()', () => {
+    it('met à jour currentBoard si c\'est le board renommé', async () => {
+      boardService.getById.mockResolvedValue({ data: MOCK_BOARDS[0] })
+
+      const store = useBoardStore()
+      await store.fetchBoard(1)
+      store.wsHandleBoardRenamed({ board_id: 1, name: 'Renommé WS' })
+
+      expect(store.currentBoard.name).toBe('Renommé WS')
+    })
+
+    it('met à jour le board dans la liste', async () => {
+      boardService.getAll.mockResolvedValue({ data: MOCK_BOARDS, total: 2 })
+
+      const store = useBoardStore()
+      await store.fetchBoards()
+      store.wsHandleBoardRenamed({ board_id: 1, name: 'Nouveau nom' })
+
+      expect(store.boards.find(b => b.id === 1).name).toBe('Nouveau nom')
+    })
+
+    it('ne fait rien si le board n\'est pas dans la liste', () => {
+      const store = useBoardStore()
+      store.wsHandleBoardRenamed({ board_id: 99, name: 'X' })
+      expect(store.currentBoard).toBeNull()
+    })
+  })
+
   // ===== removeBoard() =====
   describe('removeBoard()', () => {
     it('retire le board de la liste', async () => {

@@ -93,8 +93,47 @@ export const useCardStore = defineStore('card', () => {
     cardsByColumn.value = {}
   }
 
+  function wsHandleCardCreated(card) {
+    const col = cardsByColumn.value[card.column_id]
+    if (!col) return
+    if (!col.find(c => c.id === card.id)) {
+      col.push(card)
+      col.sort((a, b) => a.position - b.position)
+    }
+  }
+
+  function wsHandleCardUpdated(card) {
+    const col = cardsByColumn.value[card.column_id]
+    if (!col) return
+    const idx = col.findIndex(c => c.id === card.id)
+    if (idx !== -1) col[idx] = card
+  }
+
+  function wsHandleCardMoved(card) {
+    const fromId = card.from_column_id
+    if (cardsByColumn.value[fromId]) {
+      cardsByColumn.value[fromId] = cardsByColumn.value[fromId].filter(c => c.id !== card.id)
+    }
+    const toCol = cardsByColumn.value[card.column_id]
+    if (toCol && !toCol.find(c => c.id === card.id)) {
+      toCol.push(card)
+      toCol.sort((a, b) => a.position - b.position)
+    }
+  }
+
+  function wsHandleCardDeleted({ card_id, column_id }) {
+    if (cardsByColumn.value[column_id]) {
+      cardsByColumn.value[column_id] = cardsByColumn.value[column_id].filter(c => c.id !== card_id)
+    }
+  }
+
+  function wsHandleCardsReordered({ column_id, cards }) {
+    cardsByColumn.value[column_id] = cards
+  }
+
   return {
     cardsByColumn, loading,
     fetchCards, createCard, updateCard, moveCard, removeCard, reorderCards, reset,
+    wsHandleCardCreated, wsHandleCardUpdated, wsHandleCardMoved, wsHandleCardDeleted, wsHandleCardsReordered,
   }
 })

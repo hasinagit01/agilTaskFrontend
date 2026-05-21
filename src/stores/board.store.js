@@ -93,8 +93,15 @@ export const useBoardStore = defineStore('board', () => {
     }
   }
 
+  function wsHandleBoardRenamed({ board_id, name }) {
+    if (currentBoard.value?.id === board_id) currentBoard.value = { ...currentBoard.value, name }
+    const idx = boards.value.findIndex(b => b.id === board_id)
+    if (idx !== -1) boards.value[idx] = { ...boards.value[idx], name }
+  }
+
   return {
     boards, currentBoard, loading, total, hasMore,
     fetchBoards, loadMore, fetchBoard, createBoard, updateBoard, removeBoard,
+    wsHandleBoardRenamed,
   }
 })
